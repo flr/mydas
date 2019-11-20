@@ -2,15 +2,13 @@
 title: "MyDas"
 subtitle: "Observation Error Model for Data Limited Stocks"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output:
-github_document:
-  mathjax: TRUE
-pdf_document:
-  fig_width: 6 
-  fig_height: 4 
-tags: [FLR]
-bibliography: /home/laurence/Desktop/refs.bib
+output: html_document
+mathjax: TRUE
+fig_width: 6 
+fig_height: 4 
+tags: FLR FLCore introduction
 license: Creative Commons Attribution-ShareAlike 4.0 International Public License
+bibliography: refs.bib
 ---
 
 ```{r, ini, echo=FALSE, results='hide', message=FALSE, warnings=FALSE, cache=FALSE,eval=!TRUE}
@@ -81,7 +79,7 @@ library(ggplot2)
 The FLR packages can be installed from  [www.flr-project.org](http://www.flr-project.org)
 
 ```{r, eval=FALSE}
-install.packages(c("FLCore","FLFishery","FLasher","FLBRP","mpb","FLife"), 
+install.packages(c("FLCore","FLFishery","FLasher","FLBRP","mydas","FLife"), 
              repos="http://flr-project.org/R")
 ```
 
@@ -92,20 +90,9 @@ library(FLBRP)
 library(FLife)
 ```
 
-### Devtools
-
-The MyDas package has various methods for conditioning OMs, generating pseudo data and simulation testing data-limited stock assessment methods. As `mydas`  is still being developed, it is currently best installed from its [GitHub repository](https://github.com/lauriekell/mydas-pkg). It can be installed using the `devtools` package, (RTools)[https://cran.r-project.org/bin/windows/Rtools/] also needs to be installed, see (guide)[https://www.coursera.org/lecture/data-scientists-tools/installing-rtools-ecVeq].
-
-```{r, eval=FALSE}
-install.packages("devtools",dependencies=TRUE)
-```
-
-The `mydas` pakage can then be installed.
-
-```{r, echo=TRUE, eval=FALSE}
-library(devtools)
-
-devtools::install_github("lauriekell/mydas-pkg")
+```{r}
+library(plyr)
+library(reshape)
 ```
 
 ```{r, echo=TRUE}
@@ -308,7 +295,7 @@ plot(FLQuants(mnLn,fbar(om)))
 
 First create an Age Length Key that will be used to slice up numbers-at-age
 ```{r, turbot-alk,echo=TRUE,eval=TRUE}
-ak=alk(lh)  
+ak=invAlk(lh)  
 ```
 
 Then use the ALK to sample lengths
@@ -318,10 +305,10 @@ lfd=lenSample(catch.n(om)[,20:65],ak,nsample=500)
 
 ```{r, turbot-oemplot,echo=TRUE,eval=TRUE}
 ggplot(melt(lfd[,seq(1,45,10)]))+
-  geom_histogram(aes(length,weight=value),binwidth=1)+
+  geom_histogram(aes(len,weight=value),binwidth=1)+
   facet_grid(year~iter,scale="free")+
   xlab("Length (cm)")+ylab("Frequency")+
-  coord_cartesian(xlim=c(0,mean(lh["linf"])))
+  coord_cartesian(xlim=c(20,mean(lh["linf"])*1.25))
 ```
 
 **Figure `r iFig=1; iFig`** Observation error model for turbot length samples. 

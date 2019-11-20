@@ -123,14 +123,15 @@ mseXSA<-function(
   ## Update and fill in biological parameters
       
   sr=as.FLSR(window(mp,end=iYr-3),model="geomean")
-  sr=fmle(sr,control=list(trace=FALSE),method="L-BFGS-B")
+  params(sr)=propagate(params(sr),dim(sr)[6])
+  params(sr)[]=c(apply(rec(sr),6,function(x) exp(mean(log(x),na.rm=TRUE))))
   eql=FLBRP(mp,fbar=FLQuant(seq(0,4,length.out=3))) 
 
   params(eql)=params(sr)
   mp=fwdWindow(mp,eql,end=iYr+interval)
 
   ## in year update
-  mp=fwd(mp,catch=catch(om)[,ac(iYr+seq(interval))],sr=eql)#,effort_max=maxF)
+  mp=fwd(mp,catch=catch(om)[,ac(iYr+seq(interval))],sr=eql,residuals=sr_deviances%=%1)#,effort_max=maxF)
   #print(plot(FLStocks(MP=mp,OM=window(om,start=dims(mp)$minyear,end=dims(mp)$maxyear))))
 
   ## HCR

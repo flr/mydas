@@ -2,14 +2,13 @@
 subtitle: "Simulation Testing catch based mmethods"
 title: "MyDas"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output:
-github_document:
-  mathjax: TRUE
-pdf_document:
-  fig_width: 6 
-  fig_height: 4 
-tags: [FLR]
+output: html_document
+mathjax: TRUE
+fig_width: 6 
+fig_height: 4 
+tags: FLR FLCore introduction
 license: Creative Commons Attribution-ShareAlike 4.0 International Public License
+bibliography: refs.bib
 ---
  
 ```{r, ini, echo=FALSE, results='hide', message=FALSE, warnings=FALSE, cache=FALSE,eval=!TRUE}
@@ -68,6 +67,12 @@ library(FLasher)
 library(FLife)
 
 library(mydas)
+```
+
+
+```{r, eval=FALSE}
+install.packages("mpb", 
+             repos="http://flr-project.org/R")
 ```
 
 # Operating Model

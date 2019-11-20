@@ -55,6 +55,8 @@ lh[c("sel3","s","k")]=dat[c("sel3","s","k")]
 ```
 
 ```{r, smry}
+source('~/Desktop/flr/mydas/R/popdyn.R')
+
 smry=popdyn(lh)
 ```
 
@@ -74,7 +76,7 @@ smry.lorenzen=popdyn(lh.lorenzen,eq)
 ```{r}
 dat=rbind(cbind(M="Gislason",model.frame(smry)),
           cbind(M="Lorenzen",model.frame(smry.lorenzen)))
-save(dat,file="/home/laurence/Desktop/sea++/mydas/project/tasks/task6/wklifeIX/dat.RData")
+save(dat,file="/home/laurence/Desktop/sea++/mydas/final/vignettes/dat.RData")
 ```
 
 ```{r, lifeHistory}
@@ -97,7 +99,7 @@ ggpairs(dat[,c("M","fmsy","bmsy","msy","r","rc")],
 
 
 ```{r, proxies, fig.height=12, fig.width=12}
-ggpairs(dat[,c("M","lopt","clmsy","slmsy","mk","fm","lfm","spr0","fmsy")],
+ggpairs(dat[,c("M","lopt","slv","mk","fm","lfm","spr0","fmsy")],
         mapping = ggplot2::aes(color=as.character(M)),
         lower = list(continuous = wrap(mydas:::my_smooth)),
         diag=list(continuous=wrap(mydas:::my_density,alpha=0.2)),  

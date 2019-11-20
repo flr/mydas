@@ -77,15 +77,16 @@ popdyn<-function(object,eq=lhEql(lhPar(object))){
   rtn=rbind(rtn,gt)
   
   if (!("l50"%in%dimnames(rtn)[[1]])){
-     l50=FLPar("l50"=vonB(age=c(par["a50"]),par))
+     l50=FLPar("l50"=vonB(age=par["a50"],par))
      rtn=rbind(rtn,l50)}
 
-  lns=lenFn(eq,par)
+  lns=mydas:::lenFn(eq,par)
+  lns$iter=as.numeric(as.character(lns$iter))
   if (dim(lns)[1]==1) lns=as(lns,"FLPar") else lns=as(lns[,-1],"FLPar")
 
   rtn=rbind(rtn,lns["sln"])
 
-  dimnames(rtn)$params[dimnames(rtn)$params=="sln"]="slv"
+  dimnames(rtn)$params[dimnames(rtn)$params=="sln"]="sln"
   warning("add age etc")
   
  
@@ -140,21 +141,21 @@ popdyn<-function(object,eq=lhEql(lhPar(object))){
   mk=FLPar(mk=array(c(mk),c(1,length(c(mk)))))
   rtn=rbind(rtn,mk)
   
-  avirgin<-FLPar(apply(stock.n(eq)%*%ages(stock.n(eq)),6,sum)%/%
-                   apply(stock.n(eq),2:6,sum))
-  wvirgin<-FLPar(apply(stock.n(eq)%*%stock.wt(eq),6,sum)%/%
-                   apply(stock.n(eq),2:6,sum))
+  avirgin<-FLPar(avirgin=apply(stock.n(eq)%*%ages(stock.n(eq)),6,sum)%/%
+                   apply(stock.n(eq),2:6,sum))[drop=T]
+  wvirgin<-FLPar(wvirgin=apply(stock.n(eq)%*%stock.wt(eq),6,sum)%/%
+                   apply(stock.n(eq),2:6,sum))[drop=T]
   
   eq@fbar[]=refpts(eq)["msy","harvest"]
-  amsy<-FLPar(apply(stock.n(eq)%*%ages(stock.n(eq)),6,sum)%/%
-                apply(stock.n(eq),2:6,sum))
-  wmsy<-FLPar(apply(stock.n(eq)%*%stock.wt(eq),6,sum)%/%
-                apply(stock.n(eq),6,sum))
+  amsy<-FLPar(amsy=apply(stock.n(eq)%*%ages(stock.n(eq)),6,sum)%/%
+                apply(stock.n(eq),2:6,sum))[drop=T]
+  wmsy<-FLPar(wmsy=apply(stock.n(eq)%*%stock.wt(eq),6,sum)%/%
+                apply(stock.n(eq),6,sum))[drop=T]
   
-  rtn=rbind(rtn,avirgin)
-  rtn=rbind(rtn,wvirgin)
-  rtn=rbind(rtn,amsy)
-  rtn=rbind(rtn,wmsy)
+  rtn=rbind(rtn,as(as.data.frame(avirgin),"FLPar"))
+  rtn=rbind(rtn,as(as.data.frame(wvirgin),"FLPar"))
+  rtn=rbind(rtn,as(as.data.frame(amsy),"FLPar"))
+  rtn=rbind(rtn,as(as.data.frame(wmsy),"FLPar"))
   
   nms=c("fmsy","msy","bmsy","v","spr0","l50","lc","lopt","gt","slmsy","clmsy","r","rc","fm","mk")
   

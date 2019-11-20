@@ -5,7 +5,7 @@ date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
 github_document:
   mathjax: TRUE
-pdf_document:
+html_document:
   fig_width: 6 
   fig_height: 4 
 tags: [FLR]
@@ -112,7 +112,7 @@ The parameters are then used by `lhEql` to simulate the equilibrium dynamics by 
 ```{r eql}
 eq=lhEql(turbot)
 
-range(eq)[c("minfbar","maxfbar")]=ceiling(mean(turbot["a1"]))
+range(eq)[c("minfbar","maxfbar")]=ceiling(mean(turbot["sel1"]))
 ```
 
 ```{r vectors, echo=FALSE, fig.height=6}
@@ -266,10 +266,12 @@ library(mydas)
 save(oms,eq,mp,xsaControl,rf,srDev,uDev,file="/home/laurence/tmp/oms.RData")  
 ```
 ```{r}
+source('~/Desktop/flr/mydas/R/mseXSA.R')
+
 oms["Age"]=mseXSA(oms[["Projection"]],eq,  
                     mp,xsaControl,rf=rf,       
                     sr_deviances=srDev,u_deviances=uDev,   
-                    start=75,end=103,maxF=1.0)      
+                    start=75,end=103,interval=3) #maxF=1.0)      
 ```
 
 
@@ -307,23 +309,19 @@ Then the assessment is run without feedback
 
 and compared to the OM
 
-```{r biodyn-2}
-## MP
+
+```{r biodyn-3}
+load("/home/laurence/tmp/oms.RData")
+library(FLasher)
 library(mpb)
 
-mp=setMP(as(window(om,end=75),"biodyn"),
+source('~/Desktop/flr/mpb/R/hcr.R')
+
+mp=mpb:::setMP(as(window(om,end=75),"biodyn"),
          r =   0.25,
          k =1000.0,
          b0=   0.9,
          p =  -0.6)
-```
-
-
-**Figure `r iFig=iFig+1; iFig`** Comparision of estimates and simulated time series of harvest rate and stock biomass.
-
-```{r biodyn-3}
-library(FLasher)
-library(mpb)
 
 nits=dims(om)$iter
 set.seed(1234)

@@ -5,7 +5,7 @@ date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
 github_document:
   mathjax: TRUE
-pdf_document:
+html_document:
   fig_width: 6 
   fig_height: 4 
 tags: [FLR]
@@ -86,7 +86,7 @@ library(mydas)
 ```
 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=FALSE}
 options(scipen = 999)
 
 library(DBI)

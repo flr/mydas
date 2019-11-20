@@ -1,6 +1,8 @@
 mydas.html
 mydas_oem.html
-mydas_sra.html
-mydas_mse.html
-mydas_conditioning.html
-backUp
+workingOnThem
+backup
+*.html
+*.R
+mydas_mse.R
+refs.bib

@@ -1,10 +1,10 @@
 ---
-title: "Simulation Testing Data Limited Methods **mydas**"
+title: "Simulation Testing Data Limited Methods **FLife**"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
 github_document:
   mathjax: TRUE
-pdf_document:
+html_document:
   fig_width: 6 
   fig_height: 4 
 tags: [FLR]
@@ -17,7 +17,7 @@ source("R/ini.R")
 ```
 
 ```{r knitr_init, echo=FALSE, results="hide", eval=!FALSE}
-library(knitr)  
+library(knitr)
 ## Global options
 opts_chunk$set(cache     =TRUE,
                echo      =FALSE,
@@ -27,10 +27,10 @@ opts_chunk$set(cache     =TRUE,
                message   =FALSE,
                warning   =FALSE,
                tidy      =TRUE,
-               fig.height=4,
-               fig.width =6,
-               fig.path  ="tex/simtest/len-",
-               cache.path="cache/simtest/len/")
+               fig.height=6,
+               fig.width =8,
+               fig.path  ="../tex/simtest/len-",
+               cache.path="../cache/simtest/len/")
 ```
 
 ```{r}
@@ -52,33 +52,38 @@ To follow this tutorial you should have installed the following packages:
 
 for example
 
+```{r, install, eval=FALSE}
+install.packages(c("FLCore"),  repos="http://flr-project.org/R")
+install.packages(c("FLBRP"),   repos="http://flr-project.org/R")
+install.packages(c("FLasher"), repos="http://flr-project.org/R")
+install.packages(c("FLife"),   repos="http://flr-project.org/R")
+```
+
 ```{r, pkgs}
 # Load  packages
 library(ggplot2)
 library(plyr)
 library(reshape)
 
-library(popbio)
-
 library(FLCore)
 library(ggplotFL)
 library(FLBRP)
 library(FLasher)
 library(FLife)
-library(mydas)
-library(LBSPR)
 ```
 
 # Operating Model
 
 Turbot
 
-```{r, om}
+```{r, turbot}
+#source('~/Desktop/flr/R/genTime.R')
+
 lh=FLPar(c(linf= 59.1,  k=0.28, t0=-0.4, a=0.01111,b=3.15,a50=4.0, l50=43.25),units="NA")
 lh=lhPar(lh)
 eq=lhEql(lh)
 
-gTime=c(round(gt(eq)))
+gTime=c(round(mydas:::gt(eq)))
 fbar(eq)=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
                                               seq(.1,2,length.out=30)[-30],
                                               seq(2,1.0,length.out=gTime)[-1],
@@ -88,7 +93,7 @@ om=as(eq,"FLStock")
 om=fwd(om,f=fbar(om)[,-1], sr=eq)
 ```
 
-```{r, ts}
+```{r turbot-ts-ref}
 plot(FLQuants(om, 
           "f" =   function(x) fbar(x)%/%refpts(eq)["msy","harvest"], 
           "ssb" = function(x) ssb(x)%/%refpts( eq)["msy","ssb"], 
@@ -111,6 +116,43 @@ Based on Beverton and Holt  $L_{F} = \frac{L\infty +\frac{F+M}{K}L_c}{1+\frac{F+
 + $LBSPR$ Length-based spawning potential ratio (Hordyk et al. 2015) 
 + $Lime$ (Rudd and Thorson, 2018) mixed effects non-equilibrium
 
+
+
+## MLZ
+
+[MLZ](https://cran.r-project.org/web/packages/MLZ/index.html) is a package that facilitates data preparation and estimation of mortality with statistical diagnostics using the mean length-based mortality estimator and several extensions.
+
+
+```{r}
+library(MLZ)
+
+library(popbio)
+```
+
+```{r, turbot-length}
+source('~/Desktop/flr/mydas/R/omOut.R')
+
+ts   =omSmry(om,eq,lh)
+mnLen=as.FLQuant(with(ts,data.frame(data=cln,year=year,iter=iter)))
+
+plot(mnLen)
+```
+**Figure `r iFig=iFig+1; iFig`** Mean length of catch turbot. 
+
+```{r}
+#growth<-vonB
+prior=mydas:::popdyn(lh)
+```
+
+```{r, turbot-mlz}
+source('~/Desktop/flr/mydas/R/mlz.R')
+
+res=mlz(mnLen[,ac(40:60)],prior)
+
+res
+```
+
+
 ## LB-SPR
 
 [LBSPR](https://cran.r-project.org/web/packages/LBSPR/vignettes/LBSPR.html)
@@ -118,87 +160,66 @@ is a R package for simulation and estimation using life-history ratios and lengt
 
 
 
-```{r, alk}
-ak=alk(lh,cv=0.1)    
+```{r lbspr}
+library(LBSPR)
 ```
 
-```{r, lfd}
-lfd=lenSample(catch.n(om)[,20:65],ak,nsample=500)
+```{r, turbot-alk}
+ak=mydas:::invAlk(lh)  
 ```
 
-```{r, oem}
+```{r, turbot-lfd}
+lfd=mydas:::lenSample(catch.n(om)[,20:65],ak,nsample=500)
+```
+
+
+```{r, turbot-oemplot}
+save(lfd,file="lfd.RData")
+
 ggplot(melt(lfd[,seq(1,45,10)]))+
   geom_histogram(aes(len,weight=value),binwidth=1)+
   facet_grid(year~iter,scale="free")+
-  xlab("Length (cm)")+ylab("Frequency")
-  coord_cartesian(xlim=c(0,mean(lh["linf"])*1.5))
+  xlab("Length (cm)")+ylab("Frequency")+
+  coord_cartesian(xlim=c(0,mean(lh["linf"])))
 ```
 **Figure `r iFig=iFig+1; iFig`** Observation error model for turbot. 
 
 
 
-```{r, sa}
-source('~/Desktop/sea++/mydas/pkg/R/lbspr.R')
+```{r, turbot-sa}
+library(LBSPR)
+library(mydas)
+library(popbio)
+
+
+#growth=vonB
+
+lh=FLPar(c(linf= 59.1,  k=0.28, t0=-0.4, a=0.01111,b=3.15,a50=4.0, l50=43.25),units="NA")
+lh=lhPar(lh)
 
 prior=popdyn(lh)
-lb=lbspr(lfd,prior)  
-```
+source("/home/laurence/Desktop/flr/mydas/R/lbspr.R")
 
-```{r}
-
-lb=lbspr(lfd[,ac(25:50)],prior)  
-plot(as.FLQuant(lb["FM"]))
-plot(fbar(om[,ac(25:50)]))
-
-par=rbind(lh,prior["mk"])
-
-fwd.lbspr(par,1)
-
-
+lb=mydas:::lbspr(lfd,prior)  
 ```
 
 
-```{r, spr}
-ggplot(melt(sweep(lb["SPR"],c(1,3),lb["SPR","40"],"/")))+
+```{r, turbot-spr}
+ggplot(melt(sweep(lb[["spr"]],c(1,3),lb[["spr"]][,"40"],"/")))+
   geom_boxplot(aes(ac(year),value))+
   scale_x_discrete(breaks=seq(20,60,10))+
   ylab("SPR")+xlab("Year")+theme_bw()
 ```
 **Figure `r iFig=iFig+1; iFig`** Estimates of SPR for turbot. 
 
-```{r, fm}
-ggplot(melt(sweep(lb["FM"],c(1,3),lb["FM","40"],"/")))+
+```{r, turbot-fm}
+ggplot(melt(sweep(lb[["fm"]],c(1,3),lb[["fm"]][,"40"],"/")))+
   geom_boxplot(aes(ac(year),value))+
   scale_x_discrete(breaks=seq(20,60,10))+
   ylab("F")+xlab("Year")+theme_bw()
 ```
 **Figure `r iFig=iFig+1; iFig`** Estimates of $F/M$ for turbot. 
 
-
-
-```{r}
-par=rbind(lh,prior["mk"])
-
-fwd.lbspr(par,1)
-
-fwd.lbspr(propagate(par,2),1)
-```
-
-```{r,crossvalidate, eval=FALSE}
-plot(fbar(om)/m(om)["4"])
-
-prior  =popdyn(lh)
-effort=fbar(om)%/%apply(fbar(om),6,mean)
-
-obs=as.FLQuant(ddply(melt(lfd),.(year,iter), with,data.frame(data=sum(as.numeric(len)*value)/sum(value))))
-     
-hat=maply(data.frame(year=30:65), function(year){
-    lb=FLQuant(lbspr(window(lfd,end=year),prior))
-    q=apply(lb["FM"]%/%effort[,dimnames(lb["FM"])$year],6,mean)
-    hat=effort[,ac(iyr+1)]%*%q
-    fwd.lbspr(par,c(hat))}) 
-hat=as.FLQuant(transmute(melt(obs),year=year,params=params,data=value))
-```
 
 
 # References
