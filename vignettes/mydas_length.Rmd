@@ -77,8 +77,6 @@ library(FLife)
 Turbot
 
 ```{r, turbot}
-#source('~/Desktop/flr/R/genTime.R')
-
 lh=FLPar(c(linf= 59.1,  k=0.28, t0=-0.4, a=0.01111,b=3.15,a50=4.0, l50=43.25),units="NA")
 lh=lhPar(lh)
 eq=lhEql(lh)
@@ -191,11 +189,7 @@ library(LBSPR)
 library(mydas)
 library(popbio)
 
-
 #growth=vonB
-
-lh=FLPar(c(linf= 59.1,  k=0.28, t0=-0.4, a=0.01111,b=3.15,a50=4.0, l50=43.25),units="NA")
-lh=lhPar(lh)
 
 prior=popdyn(lh)
 source("/home/laurence/Desktop/flr/mydas/R/lbspr.R")

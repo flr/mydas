@@ -5,8 +5,7 @@
 \alias{icesAR}
 \title{icesAR}
 \usage{
-icesAR(x, ftar = 1, fmin = 0.05, bpa = 0.5, sigma = 0.3,
-  refpt = "msy")
+icesAR(x, ftar = 1, fmin = 0.05, bpa = 0.5, sigma = 0.3, refpt = "msy")
 }
 \arguments{
 \item{x}{\code{FLBRP} with reference points}

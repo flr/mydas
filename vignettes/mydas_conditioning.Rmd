@@ -320,6 +320,61 @@ plot(eq,refpts=c("msy","f0.1"))
 
 **Figure `r iFig=iFig+1; iFig`** Expected, equilibrium, dynamics and reference points.
 
+## Uncertainty
+
+Create an FLPar object 
+
+```{r}
+lh=FLPar(linf=100)
+lh=propagate(lh,100)
+lh=lhPar(lh)
+```
+
+Make $L__{\infty}$ a random variable
+
+```{r}
+lh["linf"]=rlnorm(100,log(lh["linf"]),0.3)
+lh["k"]   =rlnorm(100,log(lh["k"]),0.3)
+lh["s"]   =runif( 100,0.6,1)
+```
+
+```{r}
+plot(lh[c("linf","k","s")])
+```
+
+Create an FLBR object
+
+```{r}
+eq=lhEql(lh)
+```
+
+Get reference points
+
+```{r}
+refpts(eq)["msy"]
+```
+
+Compare
+
+```{r}
+rf=cast(model.frame(refpts(eq)["msy"]),
+          iter~quant,value="msy")
+pr=model.frame(lh[c("linf","k","s")])
+
+dat=cbind(rf,pr)
+dat=data.frame(fmsy=c(refpts(eq)["msy","harvest"]),
+               linf=c(lh["linf"]))
+```
+
+```{r}
+ggplot(dat)+
+  geom_point(aes(linf,fmsy))
+```
+
+```{r}
+ggpairs(log(dat[,c(2:6,10:12)]))
+```
+
 [Back to Top](#top)
 
 # Time Series Dynamics
@@ -381,7 +436,7 @@ srDev=rlnoise(nits, rec(om) %=% 0, 0.3)
 
 om=propagate(om,nits)
 
-om=fwd(om,fbar=fbar(om)[,-1], sr=eq, residuals=srDev)
+om=fwd(om,fbar=fbar(om)[,-1],sr=eq,deviances=srDev)
 ```
 
 ```{r}

@@ -28,7 +28,7 @@ popdyn<-function(object,eq=lhEql(lhPar(object))){
 
   par=lhPar(object)
 
-  rtn=par[c("linf","k","t0","a50","ato95","a","b","s","v")]
+  rtn=par[c("linf","k","t0","a50","l50","ato95","a","b","s","v")]
   
   ## SRR
   sr=params(eq)
@@ -75,9 +75,9 @@ popdyn<-function(object,eq=lhEql(lhPar(object))){
        apply(stock.wt(eq)%*%mat(eq)%*%n,6,sum)
   gt=FLPar(gt=array(c(gt),c(1,length(c(gt)))))
   rtn=rbind(rtn,gt)
-  
+
   if (!("l50"%in%dimnames(rtn)[[1]])){
-     l50=FLPar("l50"=vonB(age=par["a50"],par))
+     l50=FLPar("l50"=vonB(age=c(par["a50"]),par))
      rtn=rbind(rtn,l50)}
 
   lns=mydas:::lenFn(eq,par)
@@ -104,17 +104,17 @@ popdyn<-function(object,eq=lhEql(lhPar(object))){
   names(rfs)[1]="params"
   dimnames(rfs)[[1]]=c("fmsy","msy","bmsy")
   rtn=rbind(rtn,rfs)
- 
+
   #lopt
   growth=vonB
   lop=lopt(par)
   rtn=rbind(rtn,lop)
-  
+
   #lc
   lc=vonB(as.FLQuant(c(par["a50"]-par["ato95"]),dimnames=list(iter=dimnames(par)$iter)),par)
   lc=FLPar(lc=array(c(lc),c(1,length(c(lc)))))
   rtn=rbind(rtn,lc)
-    
+
   #LF=M
   lfm=FLPar("lfm"=c(0.75*rtn["lc"]+0.25*rtn["linf"]))
   rtn=rbind(rtn,lfm)
@@ -128,7 +128,7 @@ popdyn<-function(object,eq=lhEql(lhPar(object))){
     log(lambda(leslie(iter(eq,x),fbar=c(refpts(eq)["msy","harvest",x]))[drop=TRUE])))
   rc=FLPar(rc=array(c(rc),c(1,length(c(rc)))))
   rtn=rbind(rtn,rc)
- 
+
   #"fmsy/m"
   eq@fbar=fbar(eq)[,1]
   eq@fbar[]=refpts(eq)["msy","harvest"]

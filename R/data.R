@@ -4,20 +4,17 @@
 #'
 #' Example datasets for the classes defined in FLCore.
 #'
-#' \itemize{
-#'    \item{\code{lh}, \code{\link{FLPar}}}{A dataset with life history parameteers,
-#'     extracted from fish base.}
-#' \item{\code{prior}, \code{\link{FLPar}}}{A dataset with the priors for the life
-#'     history parameters, estimated from \code{prior} method.}
-#' \item{om, \code{\link{FLStock}}}{An Operation Model based on turbot conditioned from
-#'  \code{lh}}
-#' \item{eq, \code{\link{FLBRP}}}{Turbot equilibrium object with reference points}
-#'
+#' \item{om, \code{\link{FLStock}}}{Operation Model conditioned on turbot life history parameters'  \code{lh}}
+#' \item{eq, \code{\link{FLBRP}}}{Expected dynamics'  \code{lh}}
+#' 
+#' See [mydas_turbot](https://3o2y9wugzp1kfxr5hvzgzq-on.drv.tw/MyDas/om/mydas_turbot.html) vignette for more infomation
+#' 
 #' Datasets can be loaded by issuing the \code{data} command, as in
-#' \code{data(lh)}.
-#'
+#' \code{data(om)}
+#' \code{data(eq)}
+#' 
 #' @name datasets
-#' @aliases lh prior om eq
+#' @aliases 
 #' @seealso \linkS4class{FLStock}, \linkS4class{FLBRP}, \linkS4class{FLPar}
 #' @keywords datasets
 #' @examples

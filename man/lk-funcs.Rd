@@ -11,8 +11,6 @@ unbin(x)
 }
 \arguments{
 \item{x;}{a vector of with intervals as names}
-
-\item{x;}{a vector of with intervals as names}
 }
 \value{
 a \code{data.frame} with left and right boundaries and mid points.

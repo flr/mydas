@@ -5,11 +5,21 @@
 \alias{mseSBTP}
 \title{mseSBTP}
 \usage{
-mseSBTP(om, eq, sr_deviances, u_deviances, interval = 1,
-  start = range(om)["maxyear"] - 30, end = range(om)["maxyear"] -
-  interval, control = c(k1 = 0.25, k2 = 0.25), yrU = 1:2,
-  yrCatch = seq(interval) - 1, refU = "missing",
-  refCatch = "missing", maxF = 1.5)
+mseSBTP(
+  om,
+  eq,
+  sr_deviances,
+  u_deviances,
+  interval = 1,
+  start = range(om)["maxyear"] - 30,
+  end = range(om)["maxyear"] - interval,
+  control = c(k1 = 0.25, k2 = 0.25),
+  yrU = 1:2,
+  yrCatch = seq(interval) - 1,
+  refU = "missing",
+  refCatch = "missing",
+  maxF = 1.5
+)
 }
 \arguments{
 \item{om}{\code{FLStock} object as the operating model}

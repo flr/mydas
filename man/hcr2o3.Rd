@@ -5,8 +5,14 @@
 \alias{hcr2o3}
 \title{hcr2o3}
 \usage{
-hcr2o3(yrs, catch, index, fproxy = 1, bproxy = 1, rule = c("2o3",
-  "slope", "loess"))
+hcr2o3(
+  yrs,
+  catch,
+  index,
+  fproxy = 1,
+  bproxy = 1,
+  rule = c("2o3", "slope", "loess")
+)
 }
 \arguments{
 \item{yrs}{blah,blah,blah,...}

@@ -5,9 +5,20 @@
 \alias{mseSRA}
 \title{mseSRA}
 \usage{
-mseSRA(om, eq, mp, ftar = 1, btrig = 0.5, fmin = 0.05, blim = 0.3,
-  interval = 3, start = range(om)["maxyear"] - 30,
-  end = range(om)["maxyear"] - interval, sr_deviances, maxF = 1.5)
+mseSRA(
+  om,
+  eq,
+  mp,
+  ftar = 1,
+  btrig = 0.5,
+  fmin = 0.05,
+  blim = 0.3,
+  interval = 3,
+  start = range(om)["maxyear"] - 30,
+  end = range(om)["maxyear"] - interval,
+  sr_deviances,
+  maxF = 1.5
+)
 }
 \arguments{
 \item{om}{\code{FLStock} object as the operating model}

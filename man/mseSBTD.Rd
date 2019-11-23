@@ -5,10 +5,20 @@
 \alias{mseSBTD}
 \title{mseSBTD}
 \usage{
-mseSBTD(om, eq, control = "missing", sr_deviances, u_deviances,
-  interval = 1, start = range(om)["maxyear"] - 30,
-  end = range(om)["maxyear"] - interval, nyrs = 5, cpueFn = ssb,
-  lag = 1, maxF = 10)
+mseSBTD(
+  om,
+  eq,
+  control = "missing",
+  sr_deviances,
+  u_deviances,
+  interval = 1,
+  start = range(om)["maxyear"] - 30,
+  end = range(om)["maxyear"] - interval,
+  nyrs = 5,
+  cpueFn = ssb,
+  lag = 0,
+  maxF = 1.5
+)
 }
 \arguments{
 \item{om}{\code{FLStock} object as the operating model}

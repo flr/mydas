@@ -107,42 +107,19 @@ library(mydas)
 
 Create an Operating Model by specifying the life histoy parameters and filling in any missing values 
 
-```{r, om-lh}
-lh=FLPar(c(linf= 59.1,  k=0.28, t0=-0.4, a=0.01111,b=3.15,a50=4.0,l50=43.25),units="NA")
-
-lh=lhPar(lh)   
-```
-
-
-Then create an `FLBRP` object that represents the equilibrium, i.e. expected dynamics and reference points.
-
-```{r, om-eql, echo=TRUE}
+```{r, om}
+lh=FLPar(c(linf= 59.1,  k=0.28, t0=-0.4, a=0.01111,b=3.15,a50=4.0, l50=43.25),units="NA")
+lh=lhPar(lh)
 eq=lhEql(lh)
-```
 
-Simulate a exploitation history and current depletion level.
-
-The stock was originally underexploited, then effort increased until the stock was over fished at 2$F_{MSY}$. At which point a recovery plan was implemented, where F was reduced to $F_{MSY}$ in 1 generation time, after which the stock was exploited at $F_{MSY}$  
-
-```{r, om-f, fig.height=3, fig.width=6, echo=TRUE}
-gTime=c(round(gt(eq))) 
-
+gTime=c(round(gt(eq)))
 fbar(eq)=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
-                                                 seq(.1,2,length.out=30),
-                                                 seq(2,1.0,length.out=gTime)[-1],
-                                                 rep(1.0,61)))[,1:105]
-plot(fbar(eq))
-```
+                                              seq(.1,2,length.out=30)[-30],
+                                              seq(2,1.0,length.out=gTime)[-1],
+                                              rep(1.0,61)))[,1:105]
 
-**Figure `r iFig=iFig+1; iFig`** Exploitation History.
-
-
-```{r}
 om=as(eq,"FLStock")
-
 om=fwd(om,f=fbar(om)[,-1], sr=eq)
-
-plot(om)
 ```
 
 

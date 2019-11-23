@@ -85,93 +85,27 @@ library(plyr)
 theme_set(theme_bw())
 ```
 
-## FLife
+load Operating Model conditioned on turbot life history data.
 
-The `FLife` package is used to create a stock. 
+```{r om}
+data(om)
+```
 
-```{r turbot}
-turbot=FLPar(c(linf= 59.1,  k=0.28, t0=-0.4, a=0.01111,b=3.15,a50=4.0, l50=43.25),units="NA")
+and `FLBRP` with equilibrium dynamics
+
+```{r om}
+data(eq)
 ```
 
 
-The `lhPar` method is then used to derive the parameters for natural mortality-at=age, based on @gislason2008does, and default parameters and relationships for selection pattern and  stock recruitment. 
+To simulation random variation in the time series, deviations around the stock recruitment relationship are modelled as a random variable.
 
-```{r}
-turbot=lhPar(turbot)
-
-turbot
-```
-
-The default parameters can be changed, e.g. by changing a parameter. `sl` is the standard deviation for the lefthand limb of the double normal selection pattern, here we change it from 2 to 1 to make it steeper.
-
-
-## Equilibrium dynamics
-
-The parameters are then used by `lhEql` to simulate the equilibrium dynamics by combining the spawner/yield per recruit relationships with a stock recruiment relationship.
-
-```{r eql}
-eq=lhEql(turbot)
-
-range(eq)[c("minfbar","maxfbar")]=ceiling(mean(turbot["sel1"]))
-```
-
-```{r vectors, echo=FALSE, fig.height=6}
-sel<-function(x) 
-  catch.sel(x)%/%fapex(catch.sel(x))
-
-ggplot(FLQuants(eq,"m","catch.sel"=sel,"mat","catch.wt"))+
-  geom_line(aes(age,data))+
-  facet_wrap(~qname,scale="free")+
-  scale_x_continuous(limits=c(0,20))+ 
-  guides(colour=guide_legend(title="Species",title.position="top"))
-```
-
-**Figure `r iFig=iFig+1; iFig`** Vectors of m, selection pattern, maturity and weight-at-age.
-
-Estimate equilibrium dynamics and reference points
-
-```{r eqlcurves, echo=FALSE}
-plot(eq)
-```
-
-**Figure `r iFig=iFig+1; iFig`** Expected, equilibrium, dynamics and reference points.
-
-## Time series
-
-To go from equilibrium to time series dynamics the `FLBRP` object created by `lhEql` can be coerced to an `FLStock` object.
-
-First change the F time series so that it represents a time series where the stock was origionally lightly exploited, F increased until the stock was overfished and then fishing pressure was reduced to ensure spawning stock biomass was greater than $B_{MSY}$.
-
-```{r fbar}
-fbar(eq)=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
-                                              seq(.1,2,length.out = 30),
-                                              seq(2,1.0,length.out = 10),
-                                              rep(1.0,61)))[,1:105]
-om=as(eq,"FLStock")
-
-om=fwd(om,fbar=fbar(om)[,-1],sr=eq)
-```
-
-
-## Stochastic dynamics
-
-To simulation random variation in the time series, deviations around the stock recruitment relationship was modelled as a random variable.
-
-While to generate data for use in the MP, random measurement error was added to the simulated catch per unit effort (CPUE).
-
-```{r stock-stochastic-u}
-nits=10
-set.seed(3321)
-uDev =rlnorm(nits,setPlusGroup(stock.n(eq),10)*0,.2)
-```
-
-These deviates were then used to create a stochastic time series by projecting the dynamics from year 1.
+Deviates can then used to create a stochastic time series by projecting the dynamics from year 1.
 
 ```{r stock-stochastic-rec}
 set.seed(1234)
 srDev=rlnoise(nits,fbar(om)%=%0,.3,b=0.0)
 ```
-
 
 ```{r stock-stochastic-plot, echo=FALSE}
 plot(srDev,iter=c(7,2,9))
@@ -182,7 +116,7 @@ plot(srDev,iter=c(7,2,9))
 
 ```{r stock-stochastic-1}
 om =propagate(om,nits)
-oms=FLStocks("Projection"=fwd(om,fbar=fbar(om)[,-1],residuals=srDev,sr=eq))
+oms=FLStocks("Projection"=fwd(om,fbar=fbar(om)[,-1],deviances=srDev,sr=eq))
 ```
 
 ```{r stock-stochastic-2, echo=FALSE}
@@ -192,6 +126,28 @@ plot(oms[["Projection"]],iter=1:3)+
 
 **Figure `r iFig=iFig+1; iFig`** Stochastic Time series of F, SSB, recruitment and yield
 
+
+```{r stock-stochastic-1}
+om =propagate(om,nits)
+oms=FLStocks("Projection"=fwd(om,fbar=fbar(om)[,-1],deviances=srDev,sr=eq))
+```
+
+```{r stock-stochastic-2, echo=FALSE}
+plot(oms[["Projection"]],iter=1:3)+
+  theme(legend.position="none")
+```
+
+**Figure `r iFig=iFig+1; iFig`** Stochastic Time series of F, SSB, recruitment and yield
+
+### Observation Error Model
+
+To generate data for use in the MP, random measurement error was added to the simulated catch per unit effort (CPUE).
+
+```{r stock-stochastic-u}
+nits=10
+set.seed(3321)
+uDev =rlnorm(nits,setPlusGroup(stock.n(eq),10)*0,.2)
+```
 
 [Back to Top](#top) 
 

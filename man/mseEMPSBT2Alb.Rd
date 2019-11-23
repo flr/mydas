@@ -5,10 +5,19 @@
 \alias{mseEMPSBT2Alb}
 \title{mseEMPSBT2Alb}
 \usage{
-mseEMPSBT2Alb(om, eq, control = c(k1 = 0.25, k2 = 0.25),
-  refYr = "missing", interval = 3, start = range(om)["maxyear"] - 30,
-  end = range(om)["maxyear"] - interval, sr_deviances, u_deviances,
-  sel_deviances, maxF = 1.5)
+mseEMPSBT2Alb(
+  om,
+  eq,
+  control = c(k1 = 0.25, k2 = 0.25),
+  refYr = "missing",
+  interval = 3,
+  start = range(om)["maxyear"] - 30,
+  end = range(om)["maxyear"] - interval,
+  sr_deviances,
+  u_deviances,
+  sel_deviances,
+  maxF = 1.5
+)
 }
 \arguments{
 \item{om}{\code{FLStock} object as the operating model}

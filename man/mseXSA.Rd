@@ -5,13 +5,26 @@
 \alias{mseXSA}
 \title{mseXSA}
 \usage{
-mseXSA(om, eq, mp, control, rf = "missing", ftar = 1, fmin = 0.05,
-  bpa = 0.5, sigma = 0.3, bndTac = c(0.01, 100), interval = 3,
-  start = range(om)["maxyear"] - 30, end = range(om)["maxyear"] -
-  interval, sr_deviances = rlnoise(dim(om)[6], FLQuant(0, dimnames =
-  list(year = start:(end + interval))), 0.3),
-  u_deviances = rlnoise(dim(mp)[6], FLQuant(0, dimnames =
-  dimnames(iter(stock.n(om), 1))), 0.2), maxF = 1)
+mseXSA(
+  om,
+  eq,
+  mp,
+  control,
+  rf = "missing",
+  ftar = 1,
+  fmin = 0.05,
+  bpa = 0.5,
+  sigma = 0.3,
+  bndTac = c(0.01, 100),
+  interval = 3,
+  start = range(om)["maxyear"] - 30,
+  end = range(om)["maxyear"] - interval,
+  sr_deviances = rlnoise(dim(om)[6], FLQuant(0, dimnames = list(year = start:(end +
+    interval))), 0.3),
+  u_deviances = rlnoise(dim(mp)[6], FLQuant(0, dimnames = dimnames(iter(stock.n(om),
+    1))), 0.2),
+  maxF = 1
+)
 }
 \arguments{
 \item{om}{\code{FLStock} object as the operating model}

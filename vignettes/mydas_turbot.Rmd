@@ -1,0 +1,206 @@
+---
+title: "Conditioning Operating Models on Life History Paramters"
+subtitle: "Turbot Example"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+github_document:
+  mathjax: TRUE
+html_document:
+  fig_width: 6 
+  fig_height: 4 
+tags: [FLR]
+license: Creative Commons Attribution-ShareAlike 4.0 International Public License
+---
+
+```{r, knitr, echo=FALSE, results="hide"}
+library(knitr)
+## Global options
+opts_chunk$set(cache     =TRUE,
+               cache.path='cache/turbot-om/',
+               echo      =TRUE,
+               eval      =TRUE,
+               prompt    =FALSE,
+               comment   =NA,
+               message   =FALSE,
+               warning   =FALSE,
+               tidy      =FALSE,
+               fig.height=6,
+               fig.width =8,
+               fig.path  ='tex/turbot-om-')
+
+iFig=0
+```
+
+
+[](#top)
+
+[Equilibrium Dynamics](#Equilibrium)
+
+[Time Series](#Time)
+
+[Stochasticity](#Stochasticity)
+
+[References](#References) 
+
+# Introduction
+
+In Management Strategy Evaluation (MSE) a simulation model, known as an Operating Model (OM), is used to represent the resource dynamics and the uncertainty about them. The OM is then used to simulate pseudo data to allow Harvest Control Rules (HCRs) and Management Procedures (MPs) to be simulation tested using closed loop simulation. A MP is the combination of monitoring data, analysis method and management measures as well as reference points and harvest control rules. Linking the OM and the MP requires an Observation Error Model (OEM) to generate fishery-dependent or fishery-independent resource monitoring data. The OEM reflects the uncertainties, between the actual dynamics of the resource and perceptions arising from observations and assumptions by modelling the differences between for example of an index of abundance and the actual value in the OM. 
+
+The OM can also be used for open loop simulation testing, where psuedo data are simulated and used by an assessment procedure to estimate stock status but not fed back into the OM.
+
+## FLife
+
+Here an OM is conditioned on turbot life history parameters using the `FLife` package.
+
+```{r, flife, echo=FALSE}
+library(FLife)
+```
+
+```{r, turbot}
+turbot=FLPar(c(linf=59.1,  k=0.28, t0=-0.4, a=0.01111,
+               b   =3.15,a50=4.0, l50=43.25),units="NA")
+```
+
+
+The `lhPar` method is then used to derive the parameters for natural mortality-at=age, based on @gislason2008does, and default parameters and relationships for selection pattern and  stock recruitment. 
+
+```{r, lhpar}
+turbot=lhPar(turbot)
+
+turbot
+```
+
+The default parameters can be changed, e.g. by changing a parameter. `sl` is the standard deviation for the lefthand limb of the double normal selection pattern, here we change it from 2 to 1 to make it steeper.
+
+[Back to Top](#top) 
+
+# Equilibrium Dynamics {#Equilibrium}
+http://127.0.0.1:13112/rmd_output/4/#Time
+The parameters are then used by `lhEql` to simulate the equilibrium dynamics by combining the spawner/yield per recruit relationships with a stock recruiment relationship.
+
+```{r, flbrp, echo=FALSE}
+library(FLBRP)
+```
+
+```{r, eq}
+eq=lhEql(turbot)
+
+range(eq)[c("minfbar","maxfbar")]=ceiling(mean(turbot["sel1"]))
+```
+
+
+```{r, ggplotfl, echo=FALSE}
+library(ggplotFL)
+```
+
+```{r, vectors, echo=FALSE, fig.height=6, fig.width=6}
+sel<-function(x) 
+  catch.sel(x)%/%fapex(catch.sel(x))
+
+ggplot(FLQuants(eq,"catch.wt","mat","m","catch.sel"=sel))+
+  geom_line(aes(age,data))+
+  facet_wrap(~qname,scale="free")+
+  scale_x_continuous(limits=c(0,20))+ 
+  guides(colour=guide_legend(title="Species",title.position="top"))
+```
+
+**Figure `r iFig=iFig+1; iFig`** Vectors of m, selection pattern, maturity and weight-at-age.
+
+Estimate equilibrium dynamics and reference points
+
+```{r, eqlcurves, echo=FALSE, fig.height=6, fig.width=8}
+plot(eq,refpts="msy")
+```
+
+**Figure `r iFig=iFig+1; iFig`** Expected, equilibrium, dynamics and reference points.
+
+[Back to Top](#top) 
+
+## Time Series {#Time}
+
+To go from equilibrium to time series dynamics the `FLBRP` object created by `lhEql` can be coerced to an `FLStock` object.
+
+First change the F time series so that it represents a time series where the stock was origionally lightly exploited, F increased until the stock was overfished and then fishing pressure was reduced to ensure spawning stock biomass was greater than $B_{MSY}$.
+
+```{r, flasher, echo=FALSE}
+library(FLasher)
+```
+
+```{r, fwd}
+fbar(eq)=refpts(eq)["msy","harvest"]%*%FLQuant(c(rep(.1,19),
+                                              seq(.1,2,length.out = 30),
+                                              seq(2,1.0,length.out = 10),
+                                              rep(1.0,61)))[,1:105]
+om=as(eq,"FLStock")
+
+om=fwd(om,fbar=fbar(om)[,-1],sr=eq)
+```
+
+[Back to Top](#top) 
+
+# Stochasticity {#Stochasticity}
+
+To simulation random variation in the time series, deviations around the stock recruitment relationship was modelled as a random variable.
+
+These deviates were then used to create a stochastic time series by projecting the dynamics from year 1.
+
+```{r, srdev}
+set.seed(1234)
+srDev=rlnoise(100,fbar(om)%=%0,.3,b=0.0)
+```
+
+```{r, sr-plot, echo=FALSE}
+plot(srDev,iter=c(7,2,9))
+```
+
+**Figure `r iFig=iFig+1; iFig`** Time series of recruitment deviates
+
+
+```{r, fwd-stochastic}
+om=propagate(om,dim(srDev)[6])
+om=fwd(om,fbar=fbar(om)[,-1],deviances=srDev,sr=eq)
+```
+
+```{r, plot-stochastic, echo=FALSE}
+plot(om,iter=1:3)
+```
+
+**Figure `r iFig=iFig+1; iFig`** Stochastic Time series of F, SSB, recruitment and yield
+
+While to generate data for use in the MP, random measurement error was added to the simulated catch per unit effort (CPUE).
+
+```{r, save, echo=FALSE,eval=FALSE}
+save(om,file="../data/om.RData",compress="xz")
+save(eq,file="../data/eq.RData",compress="xz")
+```
+
+
+[Back to Top](#top) 
+
+
+\newpage
+
+## Software Versions
+
+* `r version$version.string`
+* mydas: `r packageVersion('mydas')`
+* FLCore: `r packageVersion('FLCore')`
+* FLBRP: `r packageVersion('FLBRP')`
+* FLasher: `r packageVersion('FLasher')`
+* ggplotFL: `r packageVersion('ggplotFL')`
+* **Compiled**: `r date()`
+* **Git Hash**: `r system("git log --pretty=format:'%h' -n 1", intern=TRUE)`
+
+## Author information
+
+**Laurence Kell**. laurie@seaplusplus.es
+
+
+## Acknowledgements
+
+This vignette and many of the methods documented in it were developed under the MyDas project funded by the Irish exchequer and EMFF 2014-2020. The overall aim of MyDas is to develop and test a range of assessment models and methods to establish Maximum Sustainable Yield (MSY) reference points (or proxy MSY reference points) across the spectrum of data-limited stocks.
+
+# References {#References}
+
+[Back to Top](#top) 
+

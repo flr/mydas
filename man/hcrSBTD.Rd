@@ -5,8 +5,13 @@
 \alias{hcrSBTD}
 \title{hcrSBTD}
 \usage{
-hcrSBTD(yrs, control = FLPar(c(k1 = 0.25, k2 = 0.25, gamma = 1)), index,
-  catch, ...)
+hcrSBTD(
+  yrs,
+  control = FLPar(c(k1 = 0.25, k2 = 0.25, gamma = 1)),
+  index,
+  catch,
+  ...
+)
 }
 \arguments{
 \item{yrs}{blah,blah,blah,...}
