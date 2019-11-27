@@ -32,6 +32,7 @@ hcrSBTP<-function(yrs,
                   cpue,
                   catch,
                   wt=0.5){
+
   #SBT  
   coef       =1+control["k1"]
   flag       =c(cpue<ref)

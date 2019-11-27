@@ -88,12 +88,12 @@ mseSBTP<-function(
     tac=hcrSBTP(yrs   =iYr+seq(interval),
                 control=control,
                 ref     =apply(cpue[,     ac(refU)],       6,mean),
-                target  =apply(catch(om)[,ac(refCatch)],   6,mean),
+                target  =apply(cpue[,     ac(refU)],       6,mean),
                 cpue    =apply(cpue[,     ac(iYr-yrU)],    6,mean),
                 catch   =apply(catch(om)[,ac(iYr-yrCatch)],6,mean))
 
     #### Operating Model update
-    om =fwd(om,catch=tac,sr=eq,residual=sr_deviances,effort_max=mean(maxF))
+    om =fwd(om,catch=tac,sr=eq,deviances=sr_deviances,maxF=mean(maxF))
     #print(plot(window(om,end=iYr+interval)))
   }
   cat('==\n')

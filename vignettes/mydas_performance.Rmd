@@ -12,8 +12,6 @@ tags: [FLR]
 license: Creative Commons Attribution-ShareAlike 4.0 International Public License
 ---
 
-http://rpubs.com/pl202/436164
-
 ```{r knitr_init, echo=FALSE, results="hide"}
 library(knitr)
 ## Global options
@@ -35,40 +33,12 @@ iFig=0
 ```
 
 
-```{r, pkgs, message=FALSE}
-library(ggplotFL)
-library(plyr)
-library(reshape)
-library(FLBRP)
-library(FLife)
-```
 
 ```{r, theme, echo=FALSE}
 theme_set(theme_bw())
 options(digits=3)
 ```
 
-## Install FLR packages
-
-To follow this tutorial you will have to install a number of packages, either from CRAN or from [www.flr-project.org](http://www.flr-project.org) where variety of packages and [tutorials](https://www.flr-project.org/doc/) are available.
-
-Install FLR from [https://www.flr-project.org/](www.flr-project.org/)
-```{r, eval=FALSE}
-install.packages(c("FLCore","FLFishery","FLasher","FLBRP","mpb","FLife"), 
-             repos="http://flr-project.org/R")
-```
-
-`devtools` needs to be installed and then loaded so that the `mydas` package can be installed from this GitHub repository.
-
-```{r}
-install.packages("devtools",dependencies=TRUE)
-```
-
-```{r, echo=TRUE, eval=FALSE}
-library(devtools)
-
-devtools::install_github("lauriekell/mydas-pkg")
-```
 
 ## Load Libraries
 ```{r}
@@ -84,7 +54,6 @@ library(FLBRP)
 library(FLife)
 library(mydas)
 ```
-
 
 ```{r, echo=FALSE, eval=FALSE}
 options(scipen = 999)
@@ -151,12 +120,76 @@ ggplot(mpb,aes(as.factor(year), fbar/msy_harvest,fill=as.factor(btrig)))+
       scale_x_discrete(breaks = c(50,60,70,80,90))+
       scale_y_continuous(breaks = c(0:5))+
       xlab("year")+ylab(expression(f/f[MSY]))
+```
+
+```{r}
+data(om)
+```
+
+```{r}
+plot(om,iter=7:9)
+```
+
+**Figure `r iFig=iFig+1; iFig`** Operating model example for turbot with indiviual random Monte Carlo simulations.
 
 
+```{r}
+data(eq)
+
+plot(FLQuants(window(om,30),
+             F  =function(x) fbar(x)%/%fmsy(eq),
+             SSB=function(x) ssb(x)%/%bmsy(eq))
+             ,iter=7:9)+
+             xlab("Year")
+```
+
+**Figure `r iFig=iFig+1; iFig`** Operating model example F and SSB relative to $F_{MSY}$ and $B_{MSY}$, with indiviual random Monte Carlo simulations.
+
+
+```{r}
+source('~/Desktop/flr/mydas/R/omOut.R')
+
+head(omSmry(om))
+```
+
+```{r}
+head(omSmry(om,eq))
+```
+
+```{r}
+lh=FLPar(c(a=0.01111,b=3.15))
+
+head(omSmry(om,eq,lh))
+```
+
+```{r}
+stats=omSmry(om,eq,lh)
+```
+
+```{r}
+library(dplyr)
+
+plot(FLQuants(ssb =as.FLQuant(transmute(stats,data=ssb, year=year,iter=iter)),
+              sln =as.FLQuant(transmute(stats,data=sln, year=year,iter=iter)),
+              sage=as.FLQuant(transmute(stats,data=sage,year=year,iter=iter)),
+              swt =as.FLQuant(transmute(stats,data=swt, year=year,iter=iter))),
+     iter=7)
+```
+
+**Figure `r iFig=iFig+1; iFig`** Indicators for ssb.
+
+
+```{r}
+plot(FLQuants(biomass=as.FLQuant(transmute(stats,data=stock, year=year,iter=iter)),
+              cln    =as.FLQuant(transmute(stats,data=cln,     year=year,iter=iter)),
+              cage   =as.FLQuant(transmute(stats,data=cage,    year=year,iter=iter)),
+              cwt    =as.FLQuant(transmute(stats,data=cwt,     year=year,iter=iter))),
+     iter=7)
 ```
 
 
-**Figure `r iFig=iFig+1; iFig`** 
+**Figure `r iFig=iFig+1; iFig`** Indicators for catch.
+
 
 ## Software Versions
 

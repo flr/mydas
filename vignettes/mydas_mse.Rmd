@@ -1,6 +1,6 @@
 ---
-title: "Management Strategy Evaluation using **FLife**"
-subtitle: "Data Rich and Poor Management Procedures"
+title: "Management Procedures"
+subtitle: "Data rich and data poor assessments"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
 github_document:
@@ -12,10 +12,10 @@ tags: [FLR]
 license: Creative Commons Attribution-ShareAlike 4.0 International Public License
 ---
 
-```{r knitr_init, echo=FALSE, results="hide"}
+```{r, knitr_init, echo=FALSE, results="hide"}
 library(knitr)
 ## Global options
-opts_chunk$set(cache     =!TRUE,
+opts_chunk$set(cache     =TRUE,
                cache.path='cache/mse/',
                echo      =TRUE,
                eval      =TRUE,
@@ -31,16 +31,11 @@ opts_chunk$set(cache     =!TRUE,
 iFig=0
 ```
 
-
 [](#top)
-
-[Introduction](#Introduction) 
 
 [Operating Model](#Operating Model) 
 
 [Management Procedures](#Management Procedures) 
-
-[Age Based](##Age Based) 
 
 [Biomass Based](##Biomass Based) 
 
@@ -48,106 +43,88 @@ iFig=0
 
 [References](#References) 
 
-
 # Introduction
 
-`mpb` is an R package for conducting Management Strategy Evaluation (MSE) and simulating a variety of management procedures (MPs). An MP is the combination of pre-defined data, together with an algorithm to which the data are input to provide a value for a TAC or effort control measure. In this vignette the `FLife` package is used to condition an Operating Model (OM) using life history parameters and relationships. Both packages are part of `FLR` (@kell2007flr).
+This vignette presents examples of conducting Management Strategy Evaluation (MSE) for data poor stocks. 
 
-# Installation {#Installation}
+MSE simulates feedback control, by simulation testing Management Procedures (MPs), where an MP is the combination of pre-defined data, together with an algorithm to which the data are input to provide a value for a TAC or effort control measure. the MP uses estimates of stock status to set management regulations, the resource is projected forward and then MP reapplied. The MP can be model based where a stock assessment is used to estimate stock status relative to reference points and then a Harvest Control Rule (HCR) used to set a total allowable catch (TAC). Alternatively the MP can be empirical where the data themselves are used to set management actions, e.g. if an index of abundance is increasing then catch is increased.
 
-The simplest way to obtain mpb is to install it from CRAN by using the following command in the R console:
+[ICES classifies](http://www.ices.dk/sites/pub/Publication%20Reports/Advice/2015/2015/General_context_of_ICES_advice_2015.pdf) on the basis of the available data in order to identifying the advice rules to be applied. For example **Category 1** stocks are those where quantitative assessments are available (i.e. estimates of stock and fishing mortality relative to reference points). While **Category 3:** stocks are where only surveys are avaiable that provide trends in stock metrics, such as biomass, recruitment or total mortality.
 
-```{r install, eval=FALSE}
-install.packages("mpb", repos = "http://flr-project.org/R")
-```
+### Libraries
 
-The repos options can be changed depending on personal preferences and includes options such as choosing the directories in which to install the packages see help(install.packages) for more details.
-
-
-```{r init, echo=FALSE}
-library(FLife)
-```
-
-```{r init-2, echo=FALSE}
+```{r, init-2}
 library(FLCore)
-library(FLBRP)
-library(FLAssess)
-library(FLXSA)
-
 library(ggplotFL)
 
-library(FLasher)
 library(FLBRP)
+library(FLasher)
+
 library(FLife)
-library(mpb)
-library(plyr)
-
-theme_set(theme_bw())
+library(mydas)
 ```
 
-load Operating Model conditioned on turbot life history data.
+[Back to Top](#top) 
 
-```{r om}
-data(om)
+# Operating Model
+
+The Operating Model (OM) was conditioned [turbot](/home/laurence/Desktop/flr/mydas/vignettes/mydas_turbot.html) on turbot life history data.
+
+The dynamics are modelled by an `FLStock` object
+
+```{r, om}
+data(om) 
 ```
 
-and `FLBRP` with equilibrium dynamics
+and the equilibrium dynamics by `FLBRP`.
 
-```{r om}
-data(eq)
+```{r, eq}
+data(eq) 
 ```
 
+To simulation random variation in the time series model deviations in recruits.
 
-To simulation random variation in the time series, deviations around the stock recruitment relationship are modelled as a random variable.
-
-Deviates can then used to create a stochastic time series by projecting the dynamics from year 1.
-
-```{r stock-stochastic-rec}
+```{r, stock-stochastic-rec}
 set.seed(1234)
-srDev=rlnoise(nits,fbar(om)%=%0,.3,b=0.0)
-```
+srDev=rlnoise(dims(om)$iter,fbar(om)%=%0,.3,b=0.0)
 
-```{r stock-stochastic-plot, echo=FALSE}
 plot(srDev,iter=c(7,2,9))
 ```
 
 **Figure `r iFig=iFig+1; iFig`** Time series of recruitment deviates
 
+The stock is then projected with these deviates.
 
-```{r stock-stochastic-1}
-om =propagate(om,nits)
+```{r, stock-stochastic-1}
+om =propagate(om,dims(om)$iter)
 oms=FLStocks("Projection"=fwd(om,fbar=fbar(om)[,-1],deviances=srDev,sr=eq))
-```
 
-```{r stock-stochastic-2, echo=FALSE}
 plot(oms[["Projection"]],iter=1:3)+
   theme(legend.position="none")
 ```
 
-**Figure `r iFig=iFig+1; iFig`** Stochastic Time series of F, SSB, recruitment and yield
-
-
-```{r stock-stochastic-1}
-om =propagate(om,nits)
-oms=FLStocks("Projection"=fwd(om,fbar=fbar(om)[,-1],deviances=srDev,sr=eq))
-```
-
-```{r stock-stochastic-2, echo=FALSE}
-plot(oms[["Projection"]],iter=1:3)+
-  theme(legend.position="none")
-```
-
-**Figure `r iFig=iFig+1; iFig`** Stochastic Time series of F, SSB, recruitment and yield
+**Figure `r iFig=iFig+1; iFig`** Stochastic Time series of F, SSB, recruitment and yield; lines are individual Monte Carlo simulations.
 
 ### Observation Error Model
 
-To generate data for use in the MP, random measurement error was added to the simulated catch per unit effort (CPUE).
+To generate psuedo data for use by the MPs, first generate catch per unit effort (CPUE).
 
-```{r stock-stochastic-u}
-nits=10
-set.seed(3321)
-uDev =rlnorm(nits,setPlusGroup(stock.n(eq),10)*0,.2)
+```{r, u}
+u=catch(om)%/%fbar(om)
 ```
+
+Then simulate measurement error
+
+```{r, u-stochastic}
+set.seed(3321)
+uDev=rlnorm(dims(om)$iter,u%=%0,.2)
+```
+
+```{r, u-plot, fig.height=4}
+plot(u%*%uDev,iter=c(7,2,9))
+```
+
+**Figure `r iFig=iFig+1; iFig`** Time series of recruitment deviates
 
 [Back to Top](#top) 
 
@@ -155,15 +132,41 @@ uDev =rlnorm(nits,setPlusGroup(stock.n(eq),10)*0,.2)
 
 # Management Procedures
 
-## Feedback control
+## Model Based
 
-Management of a fish stocks is done using feedback control. The stock is assessed using historical data which is used estimate current stock status and then to project the stock forward under alternative management regulations for a variety of hypotheses and system dynamics. This procedure is then repeated in subsequent year to monitor and adjust the impact of management. MSE does this my simulating a MP. These can either be model based or empirical, i.e. based on a stock assessment or data alone. 
+### Assessment Procedure
 
-In the `mpb` package there are a variety of MP, e.g. age, biomass and empirical based.
+The MP is based on a biomass dynamic stock assessment model which takes as inputs total catch and catch per unit effort (CPUE) as a proxy for stock abundance and estimates population growth rate ($r$), virgin biomass ($K$) and the surplus production function.
+
+Model-based MPs, based on a stock assessment model, may include the estimation of MSY-based reference points, but the values of F, $F_{MSY}$ , B and $B_{MSY}$ from the OM do not need to be equivalent to their proxies in the MP (e.g. if a stock assessment models used in the MP is structually different from that used to condition the OM).
+
+The `mpb` package includes is a biomass dynamic stock assessment, designed to be used as an MP. 
+
+```{r}
+library(mpb)
+```
+
+
+```{r, biodyn}
+load("/home/laurence/tmp/oms.RData")
+
+source('~/Desktop/flr/mpb/R/hcr.R')
+source('~/Desktop/flr/mpb/R/setMP.R')
+
+mp=setMP(as(window(om,end=75),"biodyn"),
+         r =   0.25,
+         k =1000.0,
+         b0=   0.9,
+         p =  -0.6)  
+
+save(om,mp,file="/home/laurence/tmp/t.RData")
+```
 
 ### Harvest Control Rule
 
-```{r hcr,echo=TRUE}
+A harvest control rule (HCR) is then used to set a TAC. 
+
+```{r, hcr,echo=TRUE}
 library(kobe)
 
 hcr= data.frame(stock  =c(0.0 ,0.1 , 0.6,2.0), 
@@ -174,151 +177,106 @@ kobePhase()+
 
 **Figure `r iFig=iFig+1; iFig`** Hockey stick harvest control rule.
 
-## Age Based
+The brown line sets the harvest rate (y-axis) depending on the estimated stock biomass (x-axis). 
 
-In this example the MP is based on an Virtual Population Analysis (VPA). 
+### Simulation
 
-First the control settings are checked by running `FLXSA` on data simulated by the OM without error and feedback. Ideally there should be no bias in the estimates from the stock assessment 
+```{r, biodyn-4}
+set.seed(1234)  
+uDev  =rlnoise(dims(om)$iter,FLQuant(0,dimnames=dimnames(iter(catch(om),1))),0.2,b=0.0)
+selDev=rlnoise(dims(om)$iter,FLQuant(0,dimnames=dimnames(iter(    m(om),1))),0.2,b=0.0)
 
-```{r xsa-xtest}
-library(FLXSA)
-mp=window(setPlusGroup(oms[["Projection"]],10),end=80)
-
-xsaControl=FLXSA.control(tol    =1e-09, maxit   =150, 
-                         min.nse=0.3,   fse     =1.0, 
-                         rage   =1,     qage    =6, 
-                         shk.n  =TRUE,  shk.f   =TRUE, 
-                         shk.yrs=1,     shk.ages=4, 
-                         window =10,    tsrange =10, 
-                         tspower= 0,
-                         vpa    =FALSE)
-```
-
-```{r xsa-xtest-2}
-idx=FLIndex(index=stock.n(mp)%*%uDev[,dimnames(stock.n(mp))$year])
-range(idx)[c("plusgroup","startf","endf")]=c(NA,0.1,.2)
-
-xsa=FLXSA(mp,idx,
-          control=xsaControl,diag.flag=FALSE)
-range(xsa)[c("min","max","plusgroup")]=range(mp)[c("min","max","plusgroup")]
-mp=mp+xsa 
-
-sr=fmle(as.FLSR(mp,model="bevholt"),control=list(silent=TRUE))
-rf=FLBRP(mp,sr) 
-```
-
-
-```{r xsa-xtest-plot}
-plot(FLStocks("Stock\nAssessment"=mp,
-              "Operating\nModel" =window(oms[["Projection"]],end=80)))
-```
-
-Before running the MSE, i.e. using XSA as part of a feedback control procedure,  the current reference points need to be estimated.
-
-Then the MSE can be run using the `mseXSA` function
-
-```{r xsa-mse}
-library(mydas)
-save(oms,eq,mp,xsaControl,rf,srDev,uDev,file="/home/laurence/tmp/oms.RData")  
-```
-```{r}
-source('~/Desktop/flr/mydas/R/mseXSA.R')
-
-oms["Age"]=mseXSA(oms[["Projection"]],eq,  
-                    mp,xsaControl,rf=rf,       
-                    sr_deviances=srDev,u_deviances=uDev,   
-                    start=75,end=103,interval=3) #maxF=1.0)      
-```
-
-
-```{r xsa-mse-plot, echo=FALSE}
-plot(oms[["Age"]],iter=1:3)+
-  theme(legend.position="none")
-```
-
-**Figure `r iFig=iFig+1; iFig`** Time series from the MSE of F, SSB, recruitment and yield
-
-
-## Biomass Based
-
-In `mpb` there is a biomass dynamic stock assessment, designed to be used as an MP.
-
-First the control object has to be set, i.e. setting best guess, bounds and any priors for parameters.
-
-
-```{r, echo=FALSE}
-library(plyr)
-library(dplyr)
-library(reshape)
-library(ggplot2)
-
-library(FLCore)
-library(ggplotFL)
-library(FLasher)
-library(FLBRP)
-library(FLife)
-library(mpb)
-library(mydas)
-```
-
-Then the assessment is run without feedback
-
-and compared to the OM
-
-
-```{r biodyn-3}
-load("/home/laurence/tmp/oms.RData")
-library(FLasher)
-library(mpb)
-
-source('~/Desktop/flr/mpb/R/hcr.R')
-
-mp=mpb:::setMP(as(window(om,end=75),"biodyn"),
-         r =   0.25,
-         k =1000.0,
-         b0=   0.9,
-         p =  -0.6)
-
-nits=dims(om)$iter
-set.seed(1234)
-srDev =rlnoise(nits,FLQuant(0,dimnames=dimnames(iter(catch(om),1))),0.3,b=0.0)
-uDev  =rlnoise(nits,FLQuant(0,dimnames=dimnames(iter(catch(om),1))),0.2,b=0.0)
-selDev=rlnoise(nits,FLQuant(0,dimnames=dimnames(iter(    m(om),1))),0.2,b=0.0)
-
-eq=FLCore::iter(eq,seq(nits))
-
-oms["Biomass"]=mydas:::mseMPB2(om,eq,mp,start=75,end=100,ftar=0.5,sr_deviances=srDev,
-                       u_deviances=uDev,sel_deviances=selDev)
+oms["Biomass"]=mydas:::mseMPB2(om,eq,mp,start=75,end=100,interval=3,
+                               ftar=0.6,
+                       sr_deviances=srDev,
+                       u_deviances=uDev,
+                       sel_deviances=selDev)
 ```
   
-```{r biodyn-mse-plot, echo=FALSE}
+```{r, biodyn-mse-plot, echo=FALSE}
 plot(window(oms[["Biomass"]],end=100),iter=1:3)+
-  theme(legend.position="none")
+  theme(legend.position="none") 
 ```
 **Figure `r iFig=iFig+1; iFig`** Time series from the MSE of F, SSB, recruitment and yield
-
-
 
 
 ## Empirical
 
-```{r emp}
-control=FLPar(k1=0.5,k2=0.5,gamma=1)
+In an empirical MP management is based on the data directly. The Commission for the Conservation of Southern Bluefin Tuna (CCSBT) provides a model-free example of a MP \citep{hillary2016scientific} that is based on year-to-year changes and trends in empirical indicators (i.e. CPUE and fisheries independent indices); reference levels are then tuned to meet management objectives using MSE, where tuning refers to adjusting the parameters of the MP to try and achieve the stated objectives represented by the OM. 
+
+### Trend
+
+A derivative control rule (D) is so called as the control signal is derived from the trend in the signal, i.e. to the derivative of the error. 
+
+
+\begin{equation}
+ TAC^1_{y+1}=TAC_y\times 
+ \left\{\begin{array}{rcl}  
+    {1-k_1|\lambda|^{\gamma}} & \mbox{for} & \lambda<0\\[0.35cm]
+    {1+k_2\lambda} & \mbox{for} & \lambda\geq 0 
+ \end{array}\right.
+\end{equation}
+
+where $\lambda$ is the slope in the regression of $\ln I_y$ against year for the most recent $n$ years and $k_1$ and $k_2$ are \textit{gain} parameters and $\gamma$ actions asymmetry so that decreases in the index do not result in the same relative change as as an increase.
+
+
+```{r, emp}
+control=FLPar(k1=1,k2=1,gamma=1)
 oms["Emprirical"]=mydas:::mseSBTD(om,eq,control=control,
                             sr_deviances=srDev,u_deviances=uDev,
                             start=75,end=100)
 ```
 
-```{r emp-mse-plot, echo=FALSE}
+```{r, emp-mse-plot, echo=FALSE}
 plot(window(oms[["Emprirical"]],end=100),iter=1:3)+
-  theme(legend.position="none")
+  theme(legend.position="none")  
 ```
 
 **Figure `r iFig=iFig+1; iFig`** Time series from the MSE of F, SSB, recruitment and yield
 
+### Proportional
 
-```{r,eval=FALSE}
-res=ldply(oms,omSmry,eq)
+A proportional control rule (P) is so called as the action is determined in proportion to the error between a signal and a reference value
+
+\begin{equation} 
+ %\begin{align*}
+  C^{\rm targ}_y = 
+  \left\{\begin{array}{rcl} 
+      {\delta \left[\frac{I_{y}}{I^*}\right]^{1-k1}} & \mbox{for} & I_{y}\geq I^*\\
+      {\delta \left[\frac{I_{y}}{I^*}\right]^{1+k2}} & \mbox{for} & I_{y}<I^* \\
+        \end{array}
+  \right.
+ %\end{align*}
+\end{equation}
+
+where $\delta$ is the target catch and $k_1$ and $k_2$ are the gain terms 
+
+The TAC is then the average of the last TAC and the value output by the HCR. 
+
+\begin{equation} 
+     TAC_{y+1} = 0.5\times\left(TAC_y+C^{\rm targ}_y\right)\\
+\end{equation}
+
+```{r, sbtp}
+source('~/Desktop/flr/mydas/R/mseSBTP.R')
+
+set.seed(1234)
+
+controlP=rbind(FLPar(k1=0.25),
+               FLPar(k2=0.25))
+controlP=propagate(controlP,100)
+
+res =mseSBTP(om,eq,
+             control =controlP,
+             start   =70,end=100,
+             sr_deviances=srDev,
+             u_deviances =uDev,
+             refU    =31:35,
+             refCatch=35:40)
+```
+
+```{r}
+plot(res,iter=7:8)
 ```
 
 [Back to Top](#top) 
@@ -328,8 +286,12 @@ res=ldply(oms,omSmry,eq)
 ## Software Versions
 
 * `r version$version.string`
+* mydas: `r packageVersion('mydas')`
 * FLCore: `r packageVersion('FLCore')`
-* FLPKG: `r # packageVersion('FLPKG')`
+* FLBRP: `r packageVersion('FLBRP')`
+* FLasher: `r packageVersion('FLasher')`
+* FLife: `r packageVersion('FLife')`
+* mpb: `r packageVersion('mpb')`
 * **Compiled**: `r date()`
 * **Git Hash**: `r system("git log --pretty=format:'%h' -n 1", intern=TRUE)`
 
