@@ -36,27 +36,28 @@ setGeneric('omSmry', function(x,y,z,...) standardGeneric('omSmry'))
 setMethod('omSmry', signature(x="FLStock",y="missing","z"="missing"),
           function(x,y,z,...){
             
-            omSmryFn(x)})
+            omSmryFn(x,y=NULL,z=NULL)})
 
 setMethod('omSmry', signature(x="FLStock",y="FLBRP","z"="missing"),
-          function(x,y=y,z=FLPar(a=0.0003,b=3),...)
+          function(x,y,z,...)
             
-            omSmryFn(x,y,z))
+            omSmryFn(x,y,z=NULL))
 
 setMethod('omSmry', signature(x="FLStock",y="FLBRP","z"="FLPar"),
-          function(x,y,z,...)
+          function(x,y,z,...){
 
-            omSmryFn(x,y,z))
+            omSmryFn(x,y,z)})
 
 setMethod('omSmry', signature(x="FLStock",y="FLPar","z"="missing"),
           function(x,y,z,...)
             
             omSmryFn(x,y="missing",z=y))
 
-omSmryFn<-function(x,y="missing",z=FLPar(a=0.0003,b=3)){
+omSmryFn<-function(x,y="missing",z="missing"){
   
   nms=c("iter","year","ssb","stock","rec","catch","catchjuv","fbar",
-        "crash_harvest","virgin_rec","virgin_ssb","msy_harvest","msy_ssb","msy_yield","rec_hat",
+        "crash_harvest","virgin_rec","virgin_ssb",
+        "msy_harvest","msy_ssb","msy_biomass","msy_yield","rec_hat",
         "swt","cwt","sage","cage","sln","cln") 
   
   res=omStock(x)
@@ -82,8 +83,10 @@ omSmryFn<-function(x,y="missing",z=FLPar(a=0.0003,b=3)){
     }
   
   if ("FLPar" %in% is(z))
-    if (all(c("a","b") %in% dimnames(z)$params))
-      res=merge(res,lenFn(x,z))
+    if (all(c("a","b") %in% dimnames(z)$params)){
+      z=propagate(z,dims(x)$iter)
+
+      res=merge(res,lenFn(x,z))}
 
   res=res[,names(res)[names(res)%in%nms]]
   
@@ -118,7 +121,7 @@ omRefs<-function(object){
   
   refs=rbind(as.data.frame(object["crash",c("harvest")]),
              as.data.frame(object["virgin",c("rec","ssb")]),
-             as.data.frame(object["msy",c("yield","ssb","harvest")]))
+             as.data.frame(object["msy",c("yield","ssb","biomass","harvest")]))
   refs=cast(refs,iter~refpt+quant,value="data")
   
   refs}
