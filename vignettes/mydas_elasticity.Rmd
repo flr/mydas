@@ -1,0 +1,93 @@
+---
+title: "mydas"
+subtitle: "Elasticity Analysis"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+author: "Laurence Kell"
+output: rmarkdown:::html_document
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{FLife-WKLife}
+  %\VignetteEncoding{UTF-8}
+bibliography: refs.bib
+tags: FLPKG FLR
+license: Creative Commons Attribution-ShareAlike 4.0 International
+---
+
+```{r knitr_init, echo=FALSE, results="hide"}
+library(knitr)
+## Global options
+opts_chunk$set(cache     =!TRUE,
+               echo      =TRUE,
+               eval      =TRUE,
+               prompt    =FALSE,
+               comment   =NA,
+               message   =FALSE,
+               warning   =FALSE,
+               tidy      =FALSE,
+               fig.height=6,
+               fig.width =8)
+
+options(digits=3)
+iFig=0
+```
+
+
+## Load Libraries
+```{r}
+library(FLCore)
+library(ggplotFL)
+library(FLasher)
+library(FLBRP)
+
+library(FLife)
+library(mydas)
+```
+
+# Life history parameters
+
+
+```{r}
+par=FLPar(c(linf=59.1,  k=0.28, t0=-0.4, a=0.01111,
+            b   =3.15,a50=4.0, l50=43.25),units="NA")
+par=lhPar(par)
+```
+
+```{r, refpts}
+fn<-function(x) log(refpts(lhEql(x,refpts="msy"))[,c("harvest","ssb","yield"),drop=T])
+res=jacobian(fn,par)
+
+dimnames(res)=list(c("harvest","ssb","yield"),dimnames(par)$params)
+res
+```
+
+```{r, lopt}
+fn<-function(x) log(lopt(x)[,drop=T])
+res=jacobian(fn,par[c("linf","k","t0","a","b","m1","m2","m3")])
+
+dimnames(res)=list("lopt",c("linf","k","t0","a","b","m1","m2","m3"))
+res
+```
+
+**Figure `r iFig=iFig+1; iFig`** Equilibrium curves.
+
+
+## Software Versions
+
+* `r version$version.string`
+* FLCore: `r packageVersion('FLCore')`
+* FLBRP:  `r packageVersion('FLBRP')`
+* FLife:  `r packageVersion('FLife')`
+* mydas:  `r packageVersion('mydas')`
+* **Compiled**: `r date()`
+
+## Author information
+
+**Laurence KELL**. laurie.kell.es
+
+## Acknowledgements
+
+This vignette and many of the methods documented in it were developed under the MyDas project funded by the Irish exchequer and EMFF 2014-2020. The overall aim of MyDas is to develop and test a range of assessment models and methods to establish Maximum Sustainable Yield (MSY) reference points (or proxy MSY reference points) across the spectrum of data-limited stocks.
+
+# References {#References}
+
+

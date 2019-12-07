@@ -81,7 +81,7 @@ popdyn<-function(object,eq=lhEql(lhPar(object))){
      rtn=rbind(rtn,l50)}
 
   lns=mydas:::lenFn(eq,par)
-  lns$iter=as.numeric(as.character(lns$iter))
+  #lns$iter=as.numeric(as.character(lns$iter))
   if (dim(lns)[1]==1) lns=as(lns,"FLPar") else lns=as(lns[,-1],"FLPar")
 
   rtn=rbind(rtn,lns["sln"])
