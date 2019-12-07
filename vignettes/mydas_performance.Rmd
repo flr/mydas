@@ -28,14 +28,8 @@ opts_chunk$set(cache     =TRUE,
                fig.width =8,
                fig.path  ='tex/performance-')
 
-
 iFig=0
-```
 
-
-
-```{r, theme, echo=FALSE}
-theme_set(theme_bw())
 options(digits=3)
 ```
 

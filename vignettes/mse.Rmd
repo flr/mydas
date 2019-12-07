@@ -350,7 +350,7 @@ plot(window(oms[["Biomass2"]],end=100))+
 ## Empirical
 
 ```{r emp}
-oms[["Emprirical"]]=mseEMP(oms[["Projection"]],eql,srDev=srDev,uDev=uDev,start=75,end=103)
+oms[["Emprirical"]]=mydas:::mseEMP(oms[["Projection"]],eql,srDev=srDev,uDev=uDev,start=75,end=103)
 ```
 
 ```{r emp-mse-plot, echo=FALSE}
