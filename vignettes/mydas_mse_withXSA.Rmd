@@ -221,7 +221,7 @@ Then the MSE can be run using the `mseXSA` function
 
 ```{r}
 library(mydas)
-save(oms,eq,mp,xsaControl,rf,srDev,uDev,file="/home/laurence/tmp/oms.RData")
+#save(oms,eq,mp,xsaControl,rf,srDev,uDev,file="/home/laurence/tmp/oms.RData")
 ```
 ```{r, xsa-mse}
 source('~/Desktop/flr/mydas/R/mseXSA.R')
@@ -242,7 +242,7 @@ oms["Age"]=mseXSA(oms[["Projection"]],eq,
 ```
 
 ```{r}
-save(mp,oms,file="/home/laurence/tmp/tmp.RData")
+#save(mp,oms,file="/home/laurence/tmp/tmp.RData")
 ```
 
 ```{r, xsa-mse-plot, echo=FALSE}

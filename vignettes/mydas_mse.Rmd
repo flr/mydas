@@ -148,7 +148,7 @@ library(mpb)
 
 
 ```{r, biodyn}
-load("/home/laurence/tmp/oms.RData")
+#load("/home/laurence/tmp/oms.RData")
 
 source('~/Desktop/flr/mpb/R/hcr.R')
 source('~/Desktop/flr/mpb/R/setMP.R')
@@ -159,7 +159,7 @@ mp=setMP(as(window(om,end=75),"biodyn"),
          b0=   0.9,
          p =  -0.6)  
 
-save(om,mp,file="/home/laurence/tmp/t.RData")
+#save(om,mp,file="/home/laurence/tmp/t.RData")
 ```
 
 ### Harvest Control Rule

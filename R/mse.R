@@ -62,7 +62,7 @@ mseEMP<-function(
     tac=hcrSBT1(u,catch(om)[,ac(iYr-1)])
     
     #### Operating Model update
-    om =fwd(om,catch=tac,sr=eql,sr.residuals=srDev,maxF=mean(maxF)) 
+    om =fwd(om,catch=tac,sr=eql,residuals=srDev,maxF=mean(maxF)) 
   }
   cat('==\n')
   

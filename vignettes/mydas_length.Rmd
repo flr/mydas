@@ -29,8 +29,8 @@ opts_chunk$set(cache     =TRUE,
                tidy      =TRUE,
                fig.height=6,
                fig.width =8,
-               fig.path  ="../tex/simtest/len-",
-               cache.path="../cache/simtest/len/")
+               fig.path  ="tex/simtest/len-",
+               cache.path="cache/simtest/len/")
 ```
 
 ```{r}
@@ -193,7 +193,7 @@ library(popbio)
 #growth=vonB
 
 prior=popdyn(lh)
-source("/home/laurence/Desktop/flr/mydas/R/lbspr.R")
+source("/home/laurence-kell/Desktop/flr/mydas/R/lbspr.R")
 
 lb=mydas:::lbspr(lfd,prior)  
 ```

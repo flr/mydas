@@ -33,14 +33,157 @@ iFig=0
 
 
 ## Load Libraries
-```{r}
+```{r}---
+title: "Management Procedures"
+subtitle: "Data rich and data poor assessments"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+github_document:
+  mathjax: TRUE
+html_document:
+  fig_width: 6 
+  fig_height: 4 
+tags: [FLR]
+license: Creative Commons Attribution-ShareAlike 4.0 International Public License
+---
+
+```{r, knitr_init, echo=FALSE, results="hide"}
+library(knitr)
+## Global options
+opts_chunk$set(cache     =TRUE,
+               cache.path='cache/mse/',
+               echo      =TRUE,
+               eval      =TRUE,
+               prompt    =FALSE,
+               comment   =NA,
+               message   =FALSE,
+               warning   =FALSE,
+               tidy      =FALSE,
+               fig.height=6,
+               fig.width =8,
+               fig.path  ='tex/mse-')
+
+iFig=0
+```
+
+[](#top)
+
+[Operating Model](#Operating Model) 
+
+[Management Procedures](#Management Procedures) 
+
+[Biomass Based](##Biomass Based) 
+
+[Emprirical](##Emprirical)
+
+[References](#References) 
+
+# Introduction
+
+This vignette presents examples of conducting Management Strategy Evaluation (MSE) for data poor stocks. 
+
+MSE simulates feedback control, by simulation testing Management Procedures (MPs), where an MP is the combination of pre-defined data, together with an algorithm to which the data are input to provide a value for a TAC or effort control measure. the MP uses estimates of stock status to set management regulations, the resource is projected forward and then MP reapplied. The MP can be model based where a stock assessment is used to estimate stock status relative to reference points and then a Harvest Control Rule (HCR) used to set a total allowable catch (TAC). Alternatively the MP can be empirical where the data themselves are used to set management actions, e.g. if an index of abundance is increasing then catch is increased.
+
+[ICES classifies](http://www.ices.dk/sites/pub/Publication%20Reports/Advice/2015/2015/General_context_of_ICES_advice_2015.pdf) on the basis of the available data in order to identifying the advice rules to be applied. For example **Category 1** stocks are those where quantitative assessments are available (i.e. estimates of stock and fishing mortality relative to reference points). While **Category 3:** stocks are where only surveys are avaiable that provide trends in stock metrics, such as biomass, recruitment or total mortality.
+
+### Libraries
+
+```{r, init-2}
 library(FLCore)
 library(ggplotFL)
-library(FLasher)
+
 library(FLBRP)
+library(FLasher)
 
 library(FLife)
 library(mydas)
+```
+
+[Back to Top](#top) 
+
+# Operating Model
+
+The Operating Model (OM) was conditioned [turbot](/home/laurence/Desktop/flr/mydas/vignettes/mydas_turbot.html) on turbot life history data.
+
+The dynamics are modelled by an `FLStock` object
+
+```{r, om}
+data(om) 
+```
+
+and the equilibrium dynamics by `FLBRP`.
+
+```{r, eq}
+data(eq) 
+```
+
+To simulation random variation in the time series model deviations in recruits.
+
+```{r, stock-stochastic-rec}
+set.seed(1234)
+srDev=rlnoise(dims(om)$iter,fbar(om)%=%0,.3,b=0.0)
+
+plot(srDev,iter=c(7,2,9))
+```
+
+**Figure `r iFig=iFig+1; iFig`** Time series of recruitment deviates
+
+The stock is then projected with these deviates.
+
+```{r, stock-stochastic-1}
+om =propagate(om,dims(om)$iter)
+oms=FLStocks("Projection"=fwd(om,fbar=fbar(om)[,-1],deviances=srDev,sr=eq))
+
+plot(oms[["Projection"]],iter=1:3)+
+  theme(legend.position="none")
+```
+
+**Figure `r iFig=iFig+1; iFig`** Stochastic Time series of F, SSB, recruitment and yield; lines are individual Monte Carlo simulations.
+
+### Observation Error Model
+
+To generate psuedo data for use by the MPs, first generate catch per unit effort (CPUE).
+
+```{r, u}
+u=catch(om)%/%fbar(om)
+```
+
+Then simulate measurement error
+
+```{r, u-stochastic}
+set.seed(3321)
+uDev=rlnorm(dims(om)$iter,u%=%0,.2)
+```
+
+```{r, u-plot, fig.height=4}
+plot(u%*%uDev,iter=c(7,2,9))
+```
+
+**Figure `r iFig=iFig+1; iFig`** Time series of recruitment deviates
+
+[Back to Top](#top) 
+
+\newpage
+
+# Management Procedures
+
+## Model Based
+
+### Assessment Procedure
+
+The MP is based on a biomass dynamic stock assessment model which takes as inputs total catch and catch per unit effort (CPUE) as a proxy for stock abundance and estimates population growth rate ($r$), virgin biomass ($K$) and the surplus production function.
+
+Model-based MPs, based on a stock assessment model, may include the estimation of MSY-based reference points, but the values of F, $F_{MSY}$ , B and $B_{MSY}$ from the OM do not need to be equivalent to their proxies in the MP (e.g. if a stock assessment models used in the MP is structually different from that used to condition the OM).
+
+The `mpb` package includes is a biomass dynamic stock assessment, designed to be used as an MP. 
+
+```{r}
+library(mpb)
+```
+
+
+```{r, biodyn}
+
 ```
 
 # Life history parameters

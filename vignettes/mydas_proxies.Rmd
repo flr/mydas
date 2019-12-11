@@ -62,9 +62,8 @@ smry=popdyn(lh)
 
 ```{r, smry.lorenzen}
 lh.lorenzen=lh
-lh.lorenzen[c("m1","m2","m3")]=FLife:::mPar("lorenzen")
+lh.lorenzen[c("m1","m2","m3")]=c(0.3,-0.288,NA)
 
-growth=FLife:::vonB
 eq=lhEql(lh.lorenzen,m="lorenzen")
 smry.lorenzen=popdyn(lh.lorenzen,eq)
 ```
@@ -76,7 +75,6 @@ smry.lorenzen=popdyn(lh.lorenzen,eq)
 ```{r}
 dat=rbind(cbind(M="Gislason",model.frame(smry)),
           cbind(M="Lorenzen",model.frame(smry.lorenzen)))
-save(dat,file="/home/laurence/Desktop/sea++/mydas/final/vignettes/dat.RData")
 ```
 
 ```{r, lifeHistory}
@@ -99,7 +97,7 @@ ggpairs(dat[,c("M","fmsy","bmsy","msy","r","rc")],
 
 
 ```{r, proxies, fig.height=12, fig.width=12}
-ggpairs(dat[,c("M","lopt","slv","mk","fm","lfm","spr0","fmsy")],
+ggpairs(dat[,c("M","lopt","sln","mk","fm","lfm","spr0","fmsy")],
         mapping = ggplot2::aes(color=as.character(M)),
         lower = list(continuous = wrap(mydas:::my_smooth)),
         diag=list(continuous=wrap(mydas:::my_density,alpha=0.2)),  
@@ -122,10 +120,10 @@ idx=transform(merge(ind,refs[,c("slmsy","clmsy","lopt","lfm","iter")]),
               sl50=sln/l50,cl50=cln/l50,
               slopt=sln/lopt,clopt=cln/lopt,
               slfm =sln/lfm,clfm=cln/lfm,
-              fmsy=fbar/msy_harvest)[,c("f","CV","AR","M","s","k","bg","sel3","fmsy",
+              fmsy=fbar/msy_harvest)[,c("f","CV","AR","s","k","bg","sel3","fmsy",
             "sln","cln","sl50","cl50","slopt","clopt","slfm","clfm")]
 
-dat=melt(idx,id=c("f","CV","AR","M","s","k","bg","sel3","fmsy"))
+dat=melt(idx,id=c("f","CV","AR","s","k","bg","sel3","fmsy"))
 
 ggplot(dat)+
   geom_boxplot(aes(ac(f),value))+

@@ -371,9 +371,6 @@ ggplot(dat)+
   geom_point(aes(linf,fmsy))
 ```
 
-```{r}
-ggpairs(log(dat[,c(2:6,10:12)]))
-```
 
 [Back to Top](#top)
 
