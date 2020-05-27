@@ -8,6 +8,8 @@ vignettes
 vignettes/cache
 vignettes/tex
 .travis.yml
+R/trends.R
+R/inReserve/trends.R
 demo
 demo/mse-emp.R
 demo/mse-mpb.R
