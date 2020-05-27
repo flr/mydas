@@ -39,7 +39,7 @@ utils::globalVariables(c("objFn","setParams<-","setControl<-","fit"))
 #' @export mseMPJabba
 #' 
 
-
+if (FALSE){
 oemFn<-function(om,maxyear,devu=NULL){
   
   ts=ddply(model.frame(FLQuants(om,index  =function(x) stock(x), #catch(x)/fbar(x),
@@ -163,8 +163,6 @@ mseMPJabba<-function(om,eq,sa,
   
   return(om)}
 
-#if (!FALSE){
-
   library(FLCore)
   library(FLasher)
   library(FLBRP)
@@ -235,5 +233,5 @@ foreach(x=fl, #scen[,"file"],
   print(plot(FLStocks("om"=simplify(om),"mse"=simplify(mse))))
 
   save(mse,file=file.path(dirSS,x,"mse-hnd.RData"))
-  }
+}
   
