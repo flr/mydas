@@ -1,6 +1,6 @@
 Package: mydas
 Title: Tools for conducting Management Strategy Evaluation for data limited stocks
-Version: 1.1.6
+Version: 1.2.0
 Author: Laurence Kell <laurie@seaplusplus.co.uk>	
 Maintainer: Laurence Kell <laurie@seaplusplus.co.uk>
 Description: What the package does (one paragraph).
@@ -64,4 +64,4 @@ Collate:
  simCovar.R
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.0.0
+RoxygenNote: 7.1.0
