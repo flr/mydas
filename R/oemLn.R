@@ -170,6 +170,13 @@ lmode<-function(len,n,bin=25) {
 
 lenInd<-function(len,n,wt="missing",lopt=NA){
   
+  res=ddply(data.frame(len=len,n=n), .(len), with, data.frame(n=sum(n)))
+  n  =res$n
+  len=res$len
+  
+  if (wt!="missing")
+   wt=ddply(data.frame(len=len,n=n,wt=wt), .(len), with, data.frame(wt=sum(n*wt)/sum(wt)))[,2]
+  
   lopt=lopt[1]
   
   # L95 95th percentile
@@ -193,6 +200,7 @@ lenInd<-function(len,n,wt="missing",lopt=NA){
   
   # Lc Length at 50\% of modal abundance
   lc=lmode(len,n)*0.5
+  
   lmean=weighted.mean(len,n*(len>=lc))
 
   lbar=weighted.mean(len,n)
