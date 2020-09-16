@@ -33,22 +33,22 @@ utils::globalVariables(c("adply","dnorm","lh","llply","pnorm","rmultinom"))
 setGeneric('invAlk', function(object,...) standardGeneric('invAlk'))
 
 setMethod('invAlk', signature(object="FLPar"),
-          function(object,age=0:40,cv=0.1,lmax=1.25,...)
+          function(object,age=0:40,cv=0.1,lmax=1.25,bin=1,...)
             
-            setInvAlkFn(object,age,cv,lmax))
+            setInvAlkFn(object,age,cv,lmax,bin))
 
-setInvAlkFn<-function(par,age=0:40,cv=rep(0.1,length(age)),lmax=1.2){
+setInvAlkFn<-function(par,age=0:40,cv=rep(0.1,length(age)),lmax=1.2,bin=1){
   
   invAlk=mdply(data.frame(age=age,cv=cv), function(age,cv,par,lmax){
     res=adply(par,2,function(x,age,cv,lmax){
-        bin =seq(1:ceiling(x["linf"]*lmax))
+        bins =seq(0,ceiling(x["linf"]*lmax),bin)
         len=vonB(age,x)
         sd=len*cv
         p  =c(pnorm(1,len,sd),
-              dnorm(bin[-c(1,length(bin))],len,sd),
-              pnorm(bin[length(bin)],len,sd,lower.tail=FALSE))
+              dnorm(bins[-c(1,length(bins))],len,sd),
+              pnorm(bins[length(bins)],len,sd,lower.tail=FALSE))
   
-        data.frame(len=bin,p=p/sum(p))},
+        data.frame(len=bins,p=p/sum(p))},
       age=age,cv=cv,lmax=lmax)},par=par,lmax=lmax)
   
   invAlk=cast(invAlk,age~len~iter,fun=sum,value="p")
