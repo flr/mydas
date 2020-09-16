@@ -62,7 +62,6 @@ Collate:
  roc.R
  svr.R
  simCovar.R
- trends.R
  mseMPJabba.R
 Encoding: UTF-8
 LazyData: true
