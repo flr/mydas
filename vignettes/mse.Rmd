@@ -158,7 +158,7 @@ srDev=FLife:::rlnoise(nits,iter(fbar(eql),1)*0,.3,b=0.0)
 
 ```{r stock-stochastic-plot, echo=FALSE}
 plot(srDev)+
-    geom_point(aes(year,data,col=iter),data=as.data.frame(iter(srDev,c(7,12,19))))
+    geom_point(aes(year,data,col=iter),data=as.data.frame(iter(srDev,c(7,1))))
 ```
 
 **Figure `r iFig=iFig+1; iFig`** Time series of recruitment deviates
@@ -167,7 +167,7 @@ While to generate data for use in the MP, random measurement error was added to 
 
 ```{r stock-stochastic-u}
 set.seed(3321)
-uDev =rlnorm(nits,setPlusGroup(stock.n(eql),20)*0,.2)
+uDev =rlnoise(nits,setPlusGroup(stock.n(eql),20)*0,.2,b=0)
 ```
 
 These deviates were then used to create a stochastic time series by projecting the dynamics from year 1.
@@ -181,7 +181,7 @@ oms=FLStocks("Projection"=fwd(om,fbar=fbar(om)[,-1],
 ```{r stock-stochastic-2, echo=FALSE}
 plot(oms[["Projection"]])+
   geom_line(aes(year,data,col=iter),
-            data=as.data.frame(FLQuants(iter(oms[["Projection"]],c(7,12,19)),"Rec"=rec,"F"=fbar,"SSB"=ssb,"Catch"=catch),drop=TRUE))+
+            data=as.data.frame(FLQuants(iter(oms[["Projection"]],c(7,1)),"Rec"=rec,"F"=fbar,"SSB"=ssb,"Catch"=catch),drop=TRUE))+
   theme(legend.position="none")
 ```
 
@@ -255,7 +255,7 @@ Before running the MSE, i.e. using XSA as part of a feedback control procedure, 
 Then the MSE can be run using the `mseXSA` function
 
 ```{r xsa-mse, eval=FALSE}
-source('~/Desktop/flr/FLBRP/R/fwd-setup.R')
+#source('~/Desktop/flr/FLBRP/R/fwd-setup.R')
 
 oms[["Age"]]=mseXSA(oms[["Projection"]],eql, #OM
                     mp,control,rf=rf,        #MP
@@ -315,7 +315,7 @@ plot(FLQuants(window(oms[["Projection"]],start=20,end=75),"Biomass"=stock,"F"=fu
 
 
 ```{r biodyn-mse, eval=FALSE}
-source('~/Desktop/flr/mpb/R/hcr.R')
+#source('~/Desktop/flr/mpb/R/hcr.R')
 
 setControl(mp)=params(mp)
 
@@ -350,16 +350,16 @@ plot(window(oms[["Biomass2"]],end=100))+
 ## Empirical
 
 ```{r emp}
-source('~/Desktop/flr/mydas/R/mse.R')
-source('~/Desktop/flr/mydas/R/sbt-mse.R')
+#source('~/Desktop/flr/mydas/R/mse.R')
+#source('~/Desktop/flr/mydas/R/sbt-mse.R')
 
-oms[["Emprirical"]]=mseEMP(oms[["Projection"]],eql,srDev=srDev,uDev=uDev,start=75,end=103)
+oms[["Emprirical"]]=mydas:::mseEMP(oms[["Projection"]],eql,srDev=srDev,uDev=uDev,start=75,end=103)
 ```
 
 ```{r emp-mse-plot, echo=FALSE}
 plot(window(oms[["Emprirical"]],end=100))+
   geom_line(aes(year,data,col=iter),
-            data=as.data.frame(FLQuants(iter(window(oms[["Emprirical"]],end=100),c(7,12,19)),"Rec"=rec,"F"=fbar,"SSB"=ssb,"Catch"=catch),drop=TRUE))
+            data=as.data.frame(FLQuants(iter(window(oms[["Emprirical"]],end=100),c(7,1)),"Rec"=rec,"F"=fbar,"SSB"=ssb,"Catch"=catch),drop=TRUE))
 ```
 
 **Figure `r iFig=iFig+1; iFig`** Time series from the MSE of F, SSB, recruitment and yield

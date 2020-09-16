@@ -174,7 +174,7 @@ lenInd<-function(len,n,wt="missing",lopt=NA){
   n  =res$n
   len=res$len
   
-  if (wt!="missing")
+  if (wt[1]!="missing")
    wt=ddply(data.frame(len=len,n=n,wt=wt), .(len), with, data.frame(wt=sum(n*wt)/sum(wt)))[,2]
   
   lopt=lopt[1]

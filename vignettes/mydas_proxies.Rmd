@@ -55,7 +55,7 @@ lh[c("sel3","s","k")]=dat[c("sel3","s","k")]
 ```
 
 ```{r, smry}
-source('~/Desktop/flr/mydas/R/popdyn.R')
+#source('~/Desktop/flr/mydas/R/popdyn.R')
 
 smry=popdyn(lh)
 ```

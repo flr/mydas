@@ -224,7 +224,7 @@ library(mydas)
 #save(oms,eq,mp,xsaControl,rf,srDev,uDev,file="/home/laurence/tmp/oms.RData")
 ```
 ```{r, xsa-mse}
-source('~/Desktop/flr/mydas/R/mseXSA.R')
+!source('~/Desktop/flr/mydas/R/mseXSA.R')
 
 control=FLXSA.control(tol    =1e-16, maxit   =150,
                       min.nse=0.3,   fse     =0.5,

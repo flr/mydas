@@ -150,10 +150,10 @@ library(mpb)
 ```{r, biodyn}
 #load("/home/laurence/tmp/oms.RData")
 
-source('~/Desktop/flr/mpb/R/hcr.R')
-source('~/Desktop/flr/mpb/R/setMP.R')
+#source('~/Desktop/flr/mpb/R/hcr.R')
+#source('~/Desktop/flr/mpb/R/setMP.R')
 
-mp=setMP(as(window(om,end=75),"biodyn"),
+mp=mpb:::setMP(as(window(om,end=75),"biodyn"),
          r =   0.25,
          k =1000.0,
          b0=   0.9,
@@ -258,7 +258,7 @@ The TAC is then the average of the last TAC and the value output by the HCR.
 \end{equation}
 
 ```{r, sbtp}
-source('~/Desktop/flr/mydas/R/mseSBTP.R')
+#source('~/Desktop/flr/mydas/R/mseSBTP.R')
 
 set.seed(1234)
 

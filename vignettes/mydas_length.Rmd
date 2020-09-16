@@ -70,6 +70,8 @@ library(ggplotFL)
 library(FLBRP)
 library(FLasher)
 library(FLife)
+
+library(MLZ)
 ```
 
 # Operating Model
@@ -128,9 +130,9 @@ library(popbio)
 ```
 
 ```{r, turbot-length}
-source('~/Desktop/flr/mydas/R/omOut.R')
+#source('~/Desktop/flr/mydas/R/omOut.R')
 
-ts   =omSmry(om,eq,lh)
+ts   =mydas:::omSmry(om,eq,lh)
 mnLen=as.FLQuant(with(ts,data.frame(data=cln,year=year,iter=iter)))
 
 plot(mnLen)
@@ -138,15 +140,15 @@ plot(mnLen)
 **Figure `r iFig=iFig+1; iFig`** Mean length of catch turbot. 
 
 ```{r}
-source('~/Desktop/flr/mydas/R/popdyn.R')
+#source('~/Desktop/flr/mydas/R/popdyn.R')
 #growth<-vonB
-prior=popdyn(lh)
+prior=mydas:::popdyn(lh)
 ```
 
 ```{r, turbot-mlz}
-source('~/Desktop/flr/mydas/R/mlz.R')
+#source('~/Desktop/flr/mydas/R/mlz.R')
 
-res=mlz(mnLen[,ac(40:60)],prior)
+res=mydas:::mlz(mnLen[,ac(40:60)],prior)
 
 res
 ```
@@ -193,7 +195,7 @@ library(popbio)
 #growth=vonB
 
 prior=popdyn(lh)
-source("/home/laurence-kell/Desktop/flr/mydas/R/lbspr.R")
+#source("/home/laurence-kell/Desktop/flr/mydas/R/lbspr.R")
 
 lb=mydas:::lbspr(lfd,prior)  
 ```

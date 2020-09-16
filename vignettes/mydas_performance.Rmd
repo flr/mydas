@@ -141,7 +141,6 @@ plot(FLQuants(window(om,30),
 
 
 ```{r}
-source('~/Desktop/flr/mydas/R/omOut.R')
 
 head(omSmry(om))
 ```

@@ -22,7 +22,7 @@ unbin=function(x){
 
 lmode<-function(len,n,bin=2.5) {
 
-  res=ddply(dat,.(bin), with, data.frame(freq=sum(n)))
+  res=ddply(len,.(bin), with, data.frame(freq=sum(n)))
   res=as.character(subset(res,freq==max(freq))[1,"bin"])
   unbin(res)$mid}
 
