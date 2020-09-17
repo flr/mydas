@@ -161,7 +161,7 @@ unbin=function(x){
   
   data.frame(left=left,right=right,mid=mid,n=x)}
 
-lmode<-function(len,n,bin=25) {
+lmodeFn<-function(len,n,bin=25) {
   
   dat=data.frame(bin=cut(len,breaks=bin),n=n)
   res=ddply(dat,.(bin), with, data.frame(freq=sum(n)))
@@ -199,7 +199,7 @@ lenInd<-function(len,n,wt="missing",lopt=NA){
   
   
   # Lc Length at 50\% of modal abundance
-  lc=lmode(len,n)*0.5
+  lc=lmodeFn(len,n)*0.5
   
   lmean=weighted.mean(len,n*(len>=lc))
 
@@ -207,7 +207,7 @@ lenInd<-function(len,n,wt="missing",lopt=NA){
   
   lmaxy=NA
   if (!missing(wt))
-    lmaxy=lmode(len,n*wt)
+    lmaxy=lmodeFn(len,n*wt)
   
   res=c(l95=l95,l25=l25,lmega=lmega,lmax5=lmax5,pmega=pmega,lmean=lmean,lbar=lbar,lmaxy=lmaxy,lc=lc)
   names(res)=c("l95","l25","lmega","lmax5","pmega","lmean","lbar","lmaxy","lc")
