@@ -39,7 +39,6 @@ utils::globalVariables(c("objFn","setParams<-","setControl<-","fit"))
 #' @export mseMPJabba
 #' 
 
-if (FALSE){
 oemFn<-function(om,maxyear,devu=NULL){
   
   ts=ddply(model.frame(FLQuants(om,index  =function(x) stock(x), #catch(x)/fbar(x),
@@ -157,12 +156,14 @@ mseMPJabba<-function(om,eq,sa,
     
     #### OM Projectionfor TAC
     om =fwd(om,catch=tac,sr=eq,residuals=exp(sr_deviances))#,effort_max=maxF)}
-  }
+    }
   
   cat("==\n")
   
   return(om)}
 
+if (FALSE){
+  
   library(FLCore)
   library(FLasher)
   library(FLBRP)
