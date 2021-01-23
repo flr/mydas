@@ -58,7 +58,7 @@ oemFn<-function(om,maxyear,devu=NULL){
 jabba2biodyn<-function(object, phase=c("b0"=-1,"r"=4,"k"=3,"p"=-2,"q"=2,"sigma"=1),
                        min=0.1,max=10){
   
-  res=biodyn()
+  res=mpb:::biodyn()
   params(res)[]=object$pars[c("r","K","m","psi"),"Median"]-c(0,0,1,0)
   catch(res)   =as.FLQuant(transmute(object$inputseries$catch,year=Yr,data=Total))
   res@stock    =as.FLQuant(data.frame(year=names(object$timeseries[,"mu","B"]),data=object$timeseries[,"mu","B"]))
@@ -155,7 +155,7 @@ mseMPJabba<-function(om,eq,sa,
     tac[is.na(tac)]=1
     
     #### OM Projectionfor TAC
-    om =fwd(om,catch=tac,sr=eq,residuals=exp(sr_deviances))#,effort_max=maxF)}
+    om =FLasher:::fwd(om,catch=tac,sr=eq,residuals=exp(sr_deviances))#,effort_max=maxF)}
     }
   
   cat("==\n")
