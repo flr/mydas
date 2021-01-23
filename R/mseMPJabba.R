@@ -155,7 +155,7 @@ mseMPJabba<-function(om,eq,sa,
     tac[is.na(tac)]=1
     
     #### OM Projectionfor TAC
-    om =FLasher:::fwd(om,catch=tac,sr=eq,residuals=exp(sr_deviances))#,effort_max=maxF)}
+    om =fwd(om,catch=tac,sr=eq,residuals=exp(sr_deviances))#,effort_max=maxF)}
     }
   
   cat("==\n")
