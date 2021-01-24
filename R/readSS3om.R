@@ -161,8 +161,8 @@ ss3catch <- function(catage, wtatage, dmns, birthseas, idx) {
                         c(list(x=as.FLQuant(wtatage[fleet %in% x,][, fleet:=NULL], units="kg")),
                           dimnames(catch.n)[c("year", "area")]))
     return(FLQuants(catch.n=catch.n, catch.wt=catch.wt))
-  }
-  )
+  })
+  
   return(catch)} 
 
 getRange <- function(x) {
@@ -189,8 +189,7 @@ getRange <- function(x) {
   # set plusgroup to max age
   range["plusgroup"] <- range["maxyear"]
   
-  return(range)
-} # }}}
+  return(range)}
 
 # getDimnames {{{
 getDimnames <- function(out, birthseas) {
@@ -212,9 +211,7 @@ getDimnames <- function(out, birthseas) {
   if(all(dmns$unit == ""))
     dmns$unit <- "unique"
   
-  return(dmns)
-} # }}}
-
+  return(dmns)}
 
 buildFLSss3 <- function(out, birthseas=out$birthseas, name=out$Control_File,
                         desc=paste(out$inputs$repfile, out$SS_versionshort, sep=" - "),
@@ -359,7 +356,6 @@ buildFLSss3 <- function(out, birthseas=out$birthseas, name=out$Control_File,
   
   return(stock)}
 
-# readFLomss3 {{{
 readSS3om<-function(out, birthseas=unique(subset(out$timeseries,!is.na(SpawnBio))[,"Seas"])) {
   
   if(out$SS_versionNumeric > 3.24)
