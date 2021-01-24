@@ -360,7 +360,7 @@ buildFLSss3 <- function(out, birthseas=out$birthseas, name=out$Control_File,
   return(stock)}
 
 # readFLomss3 {{{
-readFLomss3 <- function(out, birthseas=unique(subset(out$timeseries,!is.na(SpawnBio))[,"Seas"])) {
+readSS3om<-function(out, birthseas=unique(subset(out$timeseries,!is.na(SpawnBio))[,"Seas"])) {
   
   if(out$SS_versionNumeric > 3.24)
     stop("ss3om currently only supports SS3 <= 3.24")
