@@ -145,8 +145,6 @@ mseMPJabba<-function(om,eq,sa,
     catch(mp)[,ac(iYr)]=aaply(catch(om)[,ac(iYr)],2,sum)
     mp=fwd(mp,catch=catch(mp)[,ac(iYr)])
     
-    print(file.path(path,paste("mp",ftar,iYr,".RData",sep="")))
-    
     save(mp,jb,file=file.path(path,paste("mp",ftar,iYr,".RData",sep="_")))
     
     ## HCR
