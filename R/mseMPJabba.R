@@ -233,7 +233,5 @@ foreach(x=fl, #scen[,"file"],
   
   print(plot(FLStocks("om"=simplify(om),"mse"=simplify(mse))))
 
-  save(mse,file=file.path(dirSS,x,"mse-hnd.RData"))}
-
-}
+  save(mse,file=file.path(dirSS,x,"mse-hnd.RData"))}}
   
