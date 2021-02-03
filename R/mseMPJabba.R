@@ -144,7 +144,10 @@ mseMPJabba<-function(om,eq,sa,
     catch(mp)[,ac(rev(iYr-seq(interval+1)))]=aaply(catch(om)[,ac(rev(iYr-seq(interval+1)))],2,sum)
     catch(mp)[,ac(iYr)]=aaply(catch(om)[,ac(iYr)],2,sum)
     mp=fwd(mp,catch=catch(mp)[,ac(iYr)])
-    save(mp,jb,file=file.path(path,paste("mp",ftar,iYr,".RData",sep="")))
+    
+    print(file.path(path,paste("mp",ftar,iYr,".RData",sep="")))
+    
+    save(mp,jb,file=file.path(path,paste("mp",ftar,iYr,".RData",sep="_")))
     
     ## HCR
     par=hcrParam(ftar =ftar*refpts( mp)["fmsy"],
@@ -161,77 +164,3 @@ mseMPJabba<-function(om,eq,sa,
   cat("==\n")
   
   return(om)}
-
-if (FALSE){
-  
-  library(FLCore)
-  library(FLasher)
-  library(FLBRP)
-  library(ggplotFL)
-  
-  library(plyr)
-  library(dplyr)
-  library(reshape)
-  
-  library(mpb)
-  library(flabba)
-  library(JABBApkg)
-  
-  load("/home/laurence-kell/Desktop/papers/albio/data/scen.RData")
-  load("/home/laurence-kell/Desktop/papers/albio/data/main.RData")
-  #load("/rds/general/user/lkell/home/albio/scen.RData")
-  
-  library(doParallel)
-  library(foreach)
-  
-  registerDoParallel(6)  
-
-#for (x in paste(main$scen,main$file,sep="-")){
-fl=paste(main[,"scen"],main[,"file"],sep="-")
-fl=fl[!duplicated(fl)]
-set.seed(4321)
-foreach(x=fl, #scen[,"file"],
-          .combine=c,
-          .multicombine=TRUE,
-          .export=c("mseMPJabba","oemFn","jabba2biodyn"),
-          .packages=c("JABBApkg","FLasher","mpb")) %dopar% {
-
-  #### read in SS base case
-  dirSS="/home/laurence-kell/Desktop/papers/albio/inputs/ss"
-  
-  load(file.path(dirSS,x,"om.RData"))
-  load(file.path(dirSS,x,"eq.RData"))
-  load(file.path(dirSS,x,"dgs.RData"))
-  load(file.path(dirSS,x,"rec.RData"))
-  
-  devu=as.FLQuant(transmute(subset(dgs,name=="LLCPUE3")[,c("year","season","residual")],year=year,season=season,data=residual))
-  devu=apply(devu,2,mean,na.rm=T)
-  #devu=log(rlnorm(devu,0,0))
-  
-  dev=as.FLQuant(transmute(rec,year=Yr+1,data=dev))
-  dev[is.na(dev)]=0
-  devr=rec(om)[,ac(1999:2014)]
-  devr[]=dev[,  ac(1999:2014)]
-  
-  ts=oemFn(om,1999)
-  
-  sa=list(assessment="mp",
-          scenario  ="StPauli",
-          model.type="Pella",
-          r.prior   =c(0.2,0.2),
-          BmsyK     =0.37,
-          
-          K.prior   =c(140000,1), # CV = 100%
-          psi.prior =c(1,0.05),
-          sigma.proc=0.1, #jb$estimates["sigma.proc","mu"]
-          
-          proc.dev.all=T,
-          sigma.est  =TRUE, # estimate additional variance
-          fixed.obsE =0.2)  # minimum plausible
-  
-  mse=mseMPJabba(om,eq,sa,devr,devu,path=file.path(dirSS,x))
-  
-  print(plot(FLStocks("om"=simplify(om),"mse"=simplify(mse))))
-
-  save(mse,file=file.path(dirSS,x,"mse-hnd.RData"))}}
-  
