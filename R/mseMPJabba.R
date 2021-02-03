@@ -138,13 +138,13 @@ mseMPJabba<-function(om,eq,sa,
                  nb =500,
                  nc =2)
     mp=jabba2biodyn(jb)
-    save(mp,jb,file=file.path(path,paste("jb-hnd",iYr,".RData",sep="")))
     mp=window(mp,end=iYr)
     
     ## Update current year catch
     catch(mp)[,ac(rev(iYr-seq(interval+1)))]=aaply(catch(om)[,ac(rev(iYr-seq(interval+1)))],2,sum)
     catch(mp)[,ac(iYr)]=aaply(catch(om)[,ac(iYr)],2,sum)
     mp=fwd(mp,catch=catch(mp)[,ac(iYr)])
+    save(mp,jb,file=file.path(path,paste("mp",ftar,iYr,".RData",sep="")))
     
     ## HCR
     par=hcrParam(ftar =ftar*refpts( mp)["fmsy"],
