@@ -41,7 +41,8 @@ utils::globalVariables(c("objFn","setParams<-","setControl<-","fit"))
 
 oemFn<-function(om,maxyear,devu=NULL){
   
-  ts=ddply(model.frame(FLQuants(om,index  =function(x) stock(x), #catch(x)/fbar(x),
+  ts=ddply(model.frame(FLQuants(om,
+                                index  =function(x) stock(x), #catch(x)/fbar(x),
                                 catch  =catch,
                                 ssb    =ssb, 
                                 biomass=stock),drop=TRUE),.(year),with, 
@@ -165,3 +166,4 @@ mseMPJabba<-function(om,eq,sa,
   cat("==\n")
   
   return(om)}
+
