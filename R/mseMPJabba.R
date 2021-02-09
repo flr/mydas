@@ -119,7 +119,7 @@ mseMPJabba<-function(om,eq,sa,
       u=transmute(merge(dat[,c("year","index")],as.data.frame(u_deviances,drop=T),all.x=T),Yr=year,season=season,Index=index*exp(data))}
     else 
       u=transmute(merge(dat[,c("year","index")],as.data.frame(u_deviances,drop=T),all.x=T),Yr=year,season=1,     Index=index*exp(data))
-    
+  
     sa$cpue=cast(u,Yr~season,value="Index")[,seq(dim(u_deviances)[4]+1)] 
     sa$catch=transmute(dat,   Yr=year,Total=catch)
     
@@ -146,6 +146,7 @@ mseMPJabba<-function(om,eq,sa,
     catch(mp)[,ac(iYr)]=aaply(catch(om)[,ac(iYr)],2,sum)
     mp=fwd(mp,catch=catch(mp)[,ac(iYr)])
   
+    print(plot(mp))
     save(mp,jb,file=file.path(path,paste("mp",ftar,iYr,".RData",sep="_")))
     
     ## HCR
@@ -158,9 +159,12 @@ mseMPJabba<-function(om,eq,sa,
     tac[is.na(tac)]=1
     tac[]=qmax(tac,ref*bndTac[1])
     tac[]=qmin(tac,ref*bndTac[2])
-    
+jb<<-jb
+mp<<-mp    
+
     #### OM Projectionfor TAC
     om =fwd(om,catch=tac,sr=eq,residuals=exp(sr_deviances))#,effort_max=maxF)}
+    print(plot(window(om,end=iYr+3)))
     }
   
   cat("==\n")
