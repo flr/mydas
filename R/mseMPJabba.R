@@ -145,8 +145,8 @@ mseMPJabba<-function(om,eq,sa,
     catch(mp)[,ac(rev(iYr-seq(interval+1)))]=aaply(catch(om)[,ac(rev(iYr-seq(interval+1)))],2,sum)
     catch(mp)[,ac(iYr)]=aaply(catch(om)[,ac(iYr)],2,sum)
     mp=fwd(mp,catch=catch(mp)[,ac(iYr)])
-  
-    print(plot(mp))
+    
+    #print(plot(mp))
     save(mp,jb,file=file.path(path,paste("mp",ftar,iYr,".RData",sep="_")))
     
     ## HCR
@@ -159,12 +159,10 @@ mseMPJabba<-function(om,eq,sa,
     tac[is.na(tac)]=1
     tac[]=qmax(tac,ref*bndTac[1])
     tac[]=qmin(tac,ref*bndTac[2])
-jb<<-jb
-mp<<-mp    
 
     #### OM Projectionfor TAC
     om =fwd(om,catch=tac,sr=eq,residuals=exp(sr_deviances))#,effort_max=maxF)}
-    print(plot(window(om,end=iYr+3)))
+    #print(plot(window(om,end=iYr+3)))
     }
   
   cat("==\n")
