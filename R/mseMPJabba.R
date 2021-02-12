@@ -46,7 +46,9 @@ oemFn<-function(om,maxyear,devu=NULL){
                                 catch  =catch,
                                 ssb    =ssb, 
                                 biomass=stock),drop=TRUE),.(year),with, 
-           data.frame(index=mean(index), catch=sum(catch), biomass=sum(biomass),ssb=sum(ssb)))
+           data.frame(index  =mean(index,na.rm=T), catch=sum(catch,na.rm=T), 
+                      biomass=sum(biomass,na.rm=T),ssb=sum(ssb,na.rm=T)))
+  ts$catch[is.na(ts$catch)][]=0.001
   ts=transform(ts, index=index/mean(index))
   
   ts=subset(ts,year<=maxyear)
