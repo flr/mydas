@@ -39,7 +39,7 @@ utils::globalVariables(c("objFn","setParams<-","setControl<-","fit"))
 #' @export mseMPJabba
 #' 
 
-oemFn<-function(om,maxyear,devu=NULL){
+oemFn<-function(om,maxyear=max(dimnames(om)$year),devu=NULL){
   
   ts=ddply(model.frame(FLQuants(om,
                                 index  =function(x) stock(x), #catch(x)/fbar(x),
