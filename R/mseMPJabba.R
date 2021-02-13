@@ -93,7 +93,7 @@ jabba2biodyn<-function(object, phase=c("b0"=-1,"r"=4,"k"=3,"p"=-2,"q"=2,"sigma"=
 
 mseMPJabba<-function(om,eq,sa,
                      sr_deviances,u_deviances,
-                     ftar=1.0,btrig=000.005,fmin=000.0005,blim=000.003,
+                     ftar=1.0,btrig=0.7,fmin=000.0005,blim=000.003,
                      start=range(om)["maxyear"]-15,end=range(om)["maxyear"],interval=3,
                      maxF=5,bndTac=c(0.8,1.2),
                      path=""){ 
