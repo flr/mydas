@@ -95,7 +95,7 @@ mseMPJabba<-function(om,eq,sa,
                      sr_deviances,u_deviances,
                      ftar=1.0,btrig=000.005,fmin=000.0005,blim=000.003,
                      start=range(om)["maxyear"]-15,end=range(om)["maxyear"],interval=3,
-                     maxF=10.5,bndTac=c(0.8,1.2),
+                     maxF=5,bndTac=c(0.8,1.2),
                      path=""){ 
   
   #if ("FLQuant"%in%is(  u_deviances)) u_deviances  =FLQuants(u_deviances)
@@ -148,7 +148,7 @@ mseMPJabba<-function(om,eq,sa,
     catch(mp)[,ac(iYr)]=aaply(catch(om)[,ac(iYr)],2,sum)
     mp=fwd(mp,catch=catch(mp)[,ac(iYr)])
     
-    #print(plot(mp))
+    print(plot(mp))
     save(mp,jb,file=file.path(path,paste("mp",ftar,iYr,".RData",sep="_")))
     
     ## HCR
@@ -163,8 +163,8 @@ mseMPJabba<-function(om,eq,sa,
     tac[]=qmin(tac,ref*bndTac[2])
 
     #### OM Projectionfor TAC
-    om =fwd(om,catch=tac,sr=eq,residuals=exp(sr_deviances))#,effort_max=maxF)}
-    #print(plot(window(om,end=iYr+3)))
+    om =fwd(om,catch=tac,sr=eq,residuals=exp(sr_deviances),maxF=maxF)
+    print(plot(window(om,end=iYr+3)))
     }
   
   cat("==\n")
