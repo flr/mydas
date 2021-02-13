@@ -134,7 +134,7 @@ mseMPJabba<-function(om,eq,sa,
     jb=fit_jabba(jb,
                  init.values=TRUE,
                  init.K=sa$K.prior[1],
-                 init.r=sa$r.prior[1]*2,
+                 init.r=sa$r.prior[1],
                  init.q=rep(mean(dat$index/dat$biomass),dim(sa$cpue)[2]-1),
                  ni =5500,
                  nt =1,
@@ -148,7 +148,7 @@ mseMPJabba<-function(om,eq,sa,
     catch(mp)[,ac(iYr)]=aaply(catch(om)[,ac(iYr)],2,sum)
     mp=fwd(mp,catch=catch(mp)[,ac(iYr)])
     
-    print(plot(mp))
+    #print(plot(mp))
     save(mp,jb,file=file.path(path,paste("mp",ftar,iYr,".RData",sep="_")))
     
     ## HCR
@@ -164,7 +164,7 @@ mseMPJabba<-function(om,eq,sa,
 
     #### OM Projectionfor TAC
     om =fwd(om,catch=tac,sr=eq,residuals=exp(sr_deviances),maxF=maxF)
-    print(plot(window(om,end=iYr+3)))
+    #print(plot(window(om,end=iYr+3)))
     }
   
   cat("==\n")
