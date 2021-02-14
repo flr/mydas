@@ -93,9 +93,9 @@ jabba2biodyn<-function(object, phase=c("b0"=-1,"r"=4,"k"=3,"p"=-2,"q"=2,"sigma"=
 
 mseMPJabba<-function(om,eq,sa,
                      sr_deviances,u_deviances,
-                     ftar=1.0,btrig=0.7,fmin=000.0005,blim=000.003,
+                     ftar=1.0,btrig=0.7,fmin=0.01,blim=0.2,
                      start=range(om)["maxyear"]-15,end=range(om)["maxyear"],interval=3,
-                     maxF=5,bndTac=c(0.8,1.2),
+                     maxF=2,bndTac=c(0.8,1.2),
                      path=""){ 
   
   #if ("FLQuant"%in%is(  u_deviances)) u_deviances  =FLQuants(u_deviances)
@@ -107,7 +107,7 @@ mseMPJabba<-function(om,eq,sa,
   if (nits['om']==1) stock(om)=propagate(stock(om),max(nits))
   
   ## Capacity limits maximum F
-  maxF=median(apply(fbar(window(om,end=start)),6,max)*maxF)
+  maxF=quantile(c(apply(fbar(om),c(2),median)),prob=c(0.95))*maxF
   
   ## Loop round years
   cat("==")
@@ -148,8 +148,7 @@ mseMPJabba<-function(om,eq,sa,
     catch(mp)[,ac(iYr)]=aaply(catch(om)[,ac(iYr)],2,sum)
     mp=fwd(mp,catch=catch(mp)[,ac(iYr)])
     
-    #print(plot(mp))
-    save(mp,jb,file=file.path(path,paste("mp",ftar,iYr,".RData",sep="_")))
+    save(mp,jb,file=file.path(path,paste("mp",iYr,".RData",sep="_")))
     
     ## HCR
     par=hcrParam(ftar =ftar*refpts( mp)["fmsy"],
@@ -160,12 +159,20 @@ mseMPJabba<-function(om,eq,sa,
     tac=hcr(mp,refs=par,hcrYrs=iYr+seq(interval),tac=TRUE)
     tac[is.na(tac)]=1
     tac[]=qmax(tac,ref*bndTac[1])
-    tac[]=qmin(tac,ref*bndTac[2])
-
+    tac[]=qmin(tac,min(ref*bndTac[2],refpts(mp)["msy"]))
+    mp=fwd(mp,catch=tac)
+  
     #### OM Projectionfor TAC
     om =fwd(om,catch=tac,sr=eq,residuals=exp(sr_deviances),maxF=maxF)
-    #print(plot(window(om,end=iYr+3)))
-    }
+    
+    if (FALSE){
+    p=ggplot(refTimeSeries(window(om,end=dims(catch(mp))$maxyear),eq,mp))+
+      geom_hline(aes(yintercept=1),col="red")+
+      geom_line(aes(year,data,col=what))+
+      facet_grid(qname~.,scale="free")+
+      scale_color_manual("",values=c("blue","green"))+
+      xlab("Year")+ylab("")+theme_bw()}
+   }
   
   cat("==\n")
   
