@@ -166,7 +166,7 @@ mseMPJabba<-function(om,eq,sa,
     #### OM Projectionfor TAC
     om =fwd(om,catch=tac,sr=eq,residuals=exp(sr_deviances),maxF=maxF)
     
-    if (!FALSE){
+    if (FALSE){
     ggplot(melt(refTimeSeries(mse,eq,mp,om),id=c("what","year")))+
       geom_hline(aes(yintercept=1),col="red")+
       geom_line(aes(year,value,col=what))+
