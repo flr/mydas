@@ -96,7 +96,7 @@ mseMPJabba<-function(om,eq,sa,
                      sr_deviances,u_deviances,
                      ftar=1.0,btrig=0.7,fmin=0.01,blim=0.2,
                      start=range(om)["maxyear"]-15,end=range(om)["maxyear"],interval=3,
-                     maxF=2,bndTac=c(0.5,1.5),
+                     maxF=2,bndTac=c(0.5,1.5),msyCap=1,
                      path=""){ 
   
   #if ("FLQuant"%in%is(  u_deviances)) u_deviances  =FLQuants(u_deviances)
@@ -160,7 +160,7 @@ mseMPJabba<-function(om,eq,sa,
     tac=hcr(mp,refs=par,hcrYrs=iYr+seq(interval),tac=TRUE)
     tac[is.na(tac)]=0.001
     tac[]=qmax(tac,ref*bndTac[1])
-    tac[]=qmin(tac,min(ref*bndTac[2],refpts(mp)["msy"]*1.5))
+    tac[]=qmin(tac,min(ref*bndTac[2],refpts(mp)["msy"]*msyCap))
     mp=fwd(mp,catch=tac)
   
     #### OM Projectionfor TAC
