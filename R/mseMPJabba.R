@@ -2,6 +2,7 @@ utils::globalVariables(c("objFn","setParams<-","setControl<-","fit"))
 
 #' #http://ices.dk/sites/pub/Publication%20Reports/Advice/2017/2017/12.04.03.01_Reference_points_for_category_1_and_2.pdf
 
+
 #' mse
 #' 
 #' @title mseMPJabba 
@@ -159,19 +160,20 @@ mseMPJabba<-function(om,eq,sa,
     tac=hcr(mp,refs=par,hcrYrs=iYr+seq(interval),tac=TRUE)
     tac[is.na(tac)]=0.001
     tac[]=qmax(tac,ref*bndTac[1])
-    tac[]=qmin(tac,min(ref*bndTac[2],refpts(mp)["msy"]))
+    tac[]=qmin(tac,min(ref*bndTac[2],refpts(mp)["msy"]*1.5))
     mp=fwd(mp,catch=tac)
   
     #### OM Projectionfor TAC
     om =fwd(om,catch=tac,sr=eq,residuals=exp(sr_deviances),maxF=maxF)
     
-    if (FALSE){
-    p=ggplot(refTimeSeries(window(om,end=dims(catch(mp))$maxyear),eq,mp))+
+    if (!FALSE){
+    ggplot(melt(refTimeSeries(mse,eq,mp,om),id=c("what","year")))+
       geom_hline(aes(yintercept=1),col="red")+
-      geom_line(aes(year,data,col=what))+
-      facet_grid(qname~.,scale="free")+
-      scale_color_manual("",values=c("blue","green"))+
-      xlab("Year")+ylab("")+theme_bw()}
+      geom_line(aes(year,value,col=what))+
+      facet_grid(variable~.,scale="free")+
+      #scale_color_manual("",values=c("blue","green"))+
+      xlab("Year")+ylab("")+theme_bw()
+      }
    }
   
   cat("==\n")
