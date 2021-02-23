@@ -112,7 +112,7 @@ mseMPJabba<-function(om,eq,sa,
     cat(iYr,", ",sep="")
     
     #### Observation Error Model, get catch and single CPUE, at the moment
-    dat=transmute(oemFn(om,iYr),year=year,index=biomass,catch=catch)
+    dat=transmute(oemFn(om,iYr),year=year,index=index,catch=catch)
 
     if (dim(u_deviances)[4]>1){
       u=transmute(merge(dat[,c("year","index")],as.data.frame(u_deviances,drop=T),all.x=T),Yr=year,season=season,Index=index*exp(data))}
