@@ -42,7 +42,7 @@ utils::globalVariables(c("objFn","setParams<-","setControl<-","fit"))
 
 oemFn<-function(om,maxyear=max(dimnames(om)$year),devu=NULL){
   
-  ts=model.frame(mcf(FLQuants(om,index  =function(x) apply(catch(x)/fbar(x),2,sum,na.rm=T), #,
+  ts=model.frame(mcf(FLQuants(om,index  =function(x) apply(catch(x)/fbar(x),2,sum,na.rm=T), 
                                  catch  =function(x) apply(catch(x),2,sum,na.rm=T),
                                  ssb    =function(x) apply(ssb(  x),2,sum,na.rm=T),
                                  biomass=function(x) apply(stock(x),2,sum,na.rm=T))),drop=TRUE)
@@ -92,7 +92,7 @@ mseMPJabba<-function(om,eq,sa,
                      sr_deviances,u_deviances,
                      ftar=1.0,btrig=0.7,fmin=0.01,blim=0.2,
                      start=range(om)["maxyear"]-15,end=range(om)["maxyear"],interval=3,
-                     maxF=2,bndTac=c(0.5,1.5),msyCap=1,
+                     maxF=2,bndTac=c(0.5,1.5),msyCap=1.2,index="index",
                      path=""){ 
   
   #if ("FLQuant"%in%is(  u_deviances)) u_deviances  =FLQuants(u_deviances)
@@ -112,8 +112,9 @@ mseMPJabba<-function(om,eq,sa,
     cat(iYr,", ",sep="")
     
     #### Observation Error Model, get catch and single CPUE, at the moment
-    dat=transmute(oemFn(om,iYr),year=year,index=index,catch=catch)
-
+    dat=oemFn(om,iYr)[,c("year","catch",index)]
+    names(dat)[3]="index"
+    
     if (dim(u_deviances)[4]>1){
       u=transmute(merge(dat[,c("year","index")],as.data.frame(u_deviances,drop=T),all.x=T),Yr=year,season=season,Index=index*exp(data))}
     else 
