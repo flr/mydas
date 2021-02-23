@@ -49,7 +49,7 @@ oemFn<-function(om,maxyear=max(dimnames(om)$year),devu=NULL){
   ts$catch[is.na(ts$catch)][]=0.001
   
   ts=subset(ts,year<=maxyear)
-  ts$cpue=mean(ts$biomass)*ts$cpue/mean(ts$cpue)
+  ts$cpue=mean(ts$biomass)*ts$cpue/mean(ts$cpue)  
   if (is.null(devu)) return(ts)
   
   transform(merge(ts,devu,all.x=T),cpue=cpue*exp(residual))[,-6]}
