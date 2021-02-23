@@ -42,17 +42,17 @@ utils::globalVariables(c("objFn","setParams<-","setControl<-","fit"))
 
 oemFn<-function(om,maxyear=max(dimnames(om)$year),devu=NULL){
   
-  ts=model.frame(mcf(FLQuants(om,index  =function(x) apply(catch(x)/fbar(x),2,sum,na.rm=T), 
+  ts=model.frame(mcf(FLQuants(om,cpue   =function(x) apply(catch(x)/fbar(x),2,sum,na.rm=T), 
                                  catch  =function(x) apply(catch(x),2,sum,na.rm=T),
                                  ssb    =function(x) apply(ssb(  x),2,sum,na.rm=T),
                                  biomass=function(x) apply(stock(x),2,sum,na.rm=T))),drop=TRUE)
   ts$catch[is.na(ts$catch)][]=0.001
   
   ts=subset(ts,year<=maxyear)
-  ts$index=mean(ts$biomass)*ts$index/mean(ts$index)
+  ts$cpue=mean(ts$biomass)*ts$cpue/mean(ts$cpue)
   if (is.null(devu)) return(ts)
   
-  transform(merge(ts,devu,all.x=T),index=index*exp(residual))[,-6]}
+  transform(merge(ts,devu,all.x=T),cpue=cpue*exp(residual))[,-6]}
 
 
 jabba2biodyn<-function(object, phase=c("b0"=-1,"r"=4,"k"=3,"p"=-2,"q"=2,"sigma"=1),
@@ -92,7 +92,7 @@ mseMPJabba<-function(om,eq,sa,
                      sr_deviances,u_deviances,
                      ftar=1.0,btrig=0.7,fmin=0.01,blim=0.2,
                      start=range(om)["maxyear"]-15,end=range(om)["maxyear"],interval=3,
-                     maxF=2,bndTac=c(0.5,1.5),msyCap=1.2,index="index",
+                     maxF=2,bndTac=c(0.5,1.5),msyCap=1.2,index="cpue",
                      path=""){ 
   
   #if ("FLQuant"%in%is(  u_deviances)) u_deviances  =FLQuants(u_deviances)
