@@ -42,18 +42,14 @@ utils::globalVariables(c("objFn","setParams<-","setControl<-","fit"))
 
 oemFn<-function(om,maxyear=max(dimnames(om)$year),devu=NULL){
   
-  ts=ddply(model.frame(FLQuants(om,
-                                index  =function(x) stock(x), #catch(x)/fbar(x),
-                                catch  =catch,
-                                ssb    =ssb, 
-                                biomass=stock),drop=TRUE),.(year),with, 
-           data.frame(index  =mean(index,na.rm=T), catch=sum(catch,na.rm=T), 
-                      biomass=sum(biomass,na.rm=T),ssb=sum(ssb,na.rm=T)))
+  ts=model.frame(mcf(FLQuants(om,index  =function(x) apply(catch(x)/fbar(x),2,sum,na.rm=T), #,
+                                 catch  =function(x) apply(catch(x),2,sum,na.rm=T),
+                                 ssb    =function(x) apply(ssb(  x),2,sum,na.rm=T),
+                                 biomass=function(x) apply(stock(x),2,sum,na.rm=T))),drop=TRUE)
   ts$catch[is.na(ts$catch)][]=0.001
-  ts=transform(ts, index=index/mean(index))
   
   ts=subset(ts,year<=maxyear)
-  
+  ts$index=mean(ts$biomass)*ts$index/mean(ts$index)
   if (is.null(devu)) return(ts)
   
   transform(merge(ts,devu,all.x=T),index=index*exp(residual))[,-6]}
@@ -116,7 +112,7 @@ mseMPJabba<-function(om,eq,sa,
     cat(iYr,", ",sep="")
     
     #### Observation Error Model, get catch and single CPUE, at the moment
-    dat    =oemFn(om,iYr)
+    dat=transmute(oemFn(om,iYr),year=year,index=biomass,catch=catch)
 
     if (dim(u_deviances)[4]>1){
       u=transmute(merge(dat[,c("year","index")],as.data.frame(u_deviances,drop=T),all.x=T),Yr=year,season=season,Index=index*exp(data))}
@@ -124,7 +120,7 @@ mseMPJabba<-function(om,eq,sa,
       u=transmute(merge(dat[,c("year","index")],as.data.frame(u_deviances,drop=T),all.x=T),Yr=year,season=1,     Index=index*exp(data))
   
     sa$cpue=cast(u,Yr~season,value="Index")[,seq(dim(u_deviances)[4]+1)] 
-    sa$catch=transmute(dat,   Yr=year,Total=catch)
+    sa$catch=transmute(dat, Yr=year,Total=catch)
     
     #### Management Procedure
     ## Assessment
@@ -136,7 +132,7 @@ mseMPJabba<-function(om,eq,sa,
                  init.values=TRUE,
                  init.K=sa$K.prior[1],
                  init.r=sa$r.prior[1],
-                 init.q=rep(mean(dat$index/dat$biomass),dim(sa$cpue)[2]-1),
+                 init.q=rep(1,dim(sa$cpue)[2]-1),
                  ni =5500,
                  nt =1,
                  nb =500,
