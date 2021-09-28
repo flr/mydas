@@ -1,5 +1,3 @@
-
-
 utils::globalVariables(c("adply","dnorm","lh","llply","pnorm","rmultinom"))
 
 #' invAlk

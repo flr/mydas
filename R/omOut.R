@@ -55,7 +55,7 @@ setMethod('omSmry', signature(x="FLStock",y="FLPar","z"="missing"),
 
 omSmryFn<-function(x,y="missing",z="missing"){
   
-  nms=c("iter","year","ssb","stock","rec","catch","catchjuv","fbar",
+  nms=c("iter","year","ssb","stock","rec","ebiomass","catch","catchjuv","fbar",
         "crash_harvest","virgin_rec","virgin_ssb",
         "msy_harvest","msy_ssb","msy_biomass","msy_yield","rec_hat",
         "swt","cwt","sage","cage","sln","cln") 
@@ -88,32 +88,45 @@ omSmryFn<-function(x,y="missing",z="missing"){
 
       res=merge(res,lenFn(x,z))}
 
-  res=res[,names(res)[names(res)%in%nms]]
+  res=res[do.call(order,res[,names(res)[names(res)%in%c("year","season","unit","area","iter")]]),]
   
-  res=res[do.call(order,res[,c("iter","year")]),]
-
   return(res)}
 
-omStock<-function(object){
-  sage<-function(object) apply(stock.n(object)%*%ages(stock.n(object)),2:6,sum)%/%
-    apply(stock.n(object),2:6,sum)
-  cage<-function(object) apply(catch.n(object)%*%ages(catch.n(object)),2:6,sum)%/%
-    apply(catch.n(object),2:6,sum) 
-  swt<-function(object) apply(stock.n(object)%*%stock.wt(object),2:6,sum)%/%
-    apply(stock.n(object),2:6,sum)
-  cwt<-function(object) apply(catch.n(object)%*%catch.wt(object),2:6,sum)%/%
-    apply(catch.n(object),2:6,sum) 
-  hvt   <-function(object) catch(object)/stock(object)
-  
-  recs  <-function(object) {res=rec(object)
+sage<-function(object) apply(stock.n(object)%*%ages(stock.n(object)),2:6,sum)%/%
+  apply(stock.n(object),2:6,sum)
+cage<-function(object) apply(catch.n(object)%*%ages(catch.n(object)),2:6,sum)%/%
+  apply(catch.n(object),2:6,sum) 
+swt<-function(object) apply(stock.n(object)%*%stock.wt(object),2:6,sum)%/%
+  apply(stock.n(object),2:6,sum)
+cwt<-function(object) apply(catch.n(object)%*%catch.wt(object),2:6,sum)%/%
+  apply(catch.n(object),2:6,sum) 
+hvt   <-function(object) catch(object)/stock(object)
+ebiomass<-function(object){
+  sel=harvest(object)
+  wt =catch.wt(object)%*%sel%/%fapex(sel)
+  eb.wt =qmax(wt,0.000001)
+  apply(eb.wt%*%stock.n(object),2:6,sum)}
+recs<-function(object) {res=rec(object)
   dimnames(res)[[1]]="all"
   res}
+catchJuv<-function(object) 
+  apply(catch.n(object)%*%(1-mat(object))%*%catch.wt(object),2:6,sum)
+
+omStock<-function(object){
   
-  catchJuv<-function(object) apply(catch.n(object)%*%(1-mat(object))%*%catch.wt(object),2:6,sum)
-  
-  res=FLQuants(object,"ssb"=FLCore::ssb,"stock"=FLCore::stock,"rec"=recs,"catch"=FLCore::catch,"catchjuv"=catchJuv,
+  res=FLQuants(object,
+               "ssb"=FLCore::ssb,
+               "stock"=FLCore::stock,
+               "ebiomass"=ebiomass,
+               "rec"=recs,
+               "catch"=FLCore::catch,
+               "catchjuv"=catchJuv,
                "fbar"=FLCore::fbar,
-               "swt"=swt,"cwt"=cwt,"sage"=sage,"cage"=cage)
+               "hvt" =hvt,
+               "swt"=swt,
+               "cwt"=cwt,
+               "sage"=sage,
+               "cage"=cage)
   
   model.frame(mcf(res),drop=TRUE)}
 

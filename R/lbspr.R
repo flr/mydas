@@ -48,7 +48,10 @@ lbsprFn<-function(len,params,species="",units="cm"){
  
     LBlen       =new("LB_lengths")
     LBlen@LMids =as.numeric(dimnames(len)[[1]])
-    LBlen@LData =len
+    if (is.FLQuant(len))    
+       LBlen@LData =as.matrix(len[drop=T])
+    else
+       LBlen@LData =as.matrix(len[drop=T])
     LBlen@Years =as.numeric(dimnames(len)[[2]])
     LBlen@NYears=dim(len)[2] 
 
@@ -69,7 +72,7 @@ setMethod('lbspr', signature(object="FLQuant",params='FLPar'),
       yrs=dimnames(object)$year
       
       res=mdply(data.frame(iter=seq(nits)), function(iter)
-          lbsprFn(iter(object,iter)[drop=T],iter(params,iter)))
+          lbsprFn(iter(object,iter),iter(params,iter)))
             res=data.frame(year=dimnames(object)$year,res)
 
       res$year=as.numeric(as.character(res$year))  
