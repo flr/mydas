@@ -26,6 +26,8 @@
 #' dat=cc(age=ctc$age,n=ctc$data)
 #' head(dat)
 #' }
+setGeneric('cc', function(age,n,...) standardGeneric('cc'))
+
 setMethod("cc", signature(age="numeric",n="numeric"),
           function(age,n,...){  
             res=ccFn(age,n)

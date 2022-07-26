@@ -1,4 +1,4 @@
-utils::globalVariables(c("prior","ddply",".", "hat","aply","block","se","ML","mlzFn","daply"))
+utils::globalVariables(c("params","ddply",".", "hat","aply","block","se","ML","mlzFn","daply"))
 
 #' mlz
 #' 
@@ -24,7 +24,7 @@ utils::globalVariables(c("prior","ddply",".", "hat","aply","block","se","ML","ml
 #' 
 #' @examples
 #' \dontrun{
-#' res=mydas:::mlz(mnLen[,ac(40:60)],prior)
+#' res=mydas:::mlz(mnLen[,ac(40:60)],params)
 #' }
 
 mlzFn<-function(year,len,lc,linf,k,ncp=2,ss=500){
@@ -56,9 +56,9 @@ mlz<-function(object,params,ncp=2,ss=500){
     res=mlzFn(
          year=dat$year,
          len =dat$data,
-         lc  =c(iter(prior["lc"],  i)),
-         linf=c(iter(prior["linf"],i)),
-         k   =c(iter(prior["k"],   i)),
+         lc  =c(iter(params["lc"],  i)),
+         linf=c(iter(params["linf"],i)),
+         k   =c(iter(params["k"],   i)),
          ncp=ncp,
          ss=ss)
     

@@ -107,6 +107,8 @@
 #'   method="lm",col="red",size=1.25,alpha=.1)+
 #'   theme_bw()+theme(legend.position="none")
 #'   }
+#'   
+setGeneric('powh', function(len,n,...) standardGeneric('powh'))
 setMethod("powh", signature(len='numeric', n="numeric"),
           function(len,n,weights=FALSE,fromMode=FALSE,linf=0){
   
