@@ -1,5 +1,4 @@
 utils::globalVariables(c("lhEql","lhPar","lopt","maply","lambda"))
-
 #' popdyn
 #' 
 #' @title popdyn 
