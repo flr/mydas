@@ -47,7 +47,7 @@ popdyn<-function(object,eq=lhEql(lhPar(object))){
   
   #lopt
   growth=vonB
-  lop=FLife:::lopt(par)
+  lop=lopt(par)
   rtn=rbind(rtn,lop)
   
   #lc
@@ -109,14 +109,14 @@ popdyn<-function(object,eq=lhEql(lhPar(object))){
   rtn=rbind(rtn,rfs)
 
   #lopt
-  growth=vonB
-  lop=lopt(par)
-  rtn=rbind(rtn,lop)
+  #growth=vonB
+  #lop=lopt(par)
+  #rtn=rbind(rtn,lop)
 
   #lc
-  lc=vonB(as.FLQuant(c(par["a50"]-par["ato95"]),dimnames=list(iter=dimnames(par)$iter)),par)
-  lc=FLPar(lc=array(c(lc),c(1,length(c(lc)))))
-  rtn=rbind(rtn,lc)
+  #lc=vonB(as.FLQuant(c(par["a50"]-par["ato95"]),dimnames=list(iter=dimnames(par)$iter)),par)
+  #lc=FLPar(lc=array(c(lc),c(1,length(c(lc)))))
+  #rtn=rbind(rtn,lc)
 
   #LF=M
   lfm=FLPar("lfm"=c(0.75*rtn["lc"]+0.25*rtn["linf"]))
