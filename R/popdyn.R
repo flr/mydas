@@ -47,7 +47,7 @@ popdyn<-function(object,eq=lhEql(lhPar(object))){
   
   #lopt
   growth=vonB
-  lop=lopt(par)
+  lop=FLife:::lopt(par)
   rtn=rbind(rtn,lop)
   
   #lc
@@ -64,7 +64,10 @@ popdyn<-function(object,eq=lhEql(lhPar(object))){
   #"fmsy/m"
   eq@fbar=fbar(eq)[,1]
   eq@fbar[]=refpts(eq)["msy","harvest"]
-  fm=apply(fbar(eq)%/%m(eq),6,mean)
+  
+  mval=m(eq)
+  
+  fm=apply(fbar(eq)%/%mval,6,mean)
   
   rtn=rbind(rtn,FLPar(fm=fm))
 
@@ -132,12 +135,12 @@ popdyn<-function(object,eq=lhEql(lhPar(object))){
   #"fmsy/m"
   eq@fbar=fbar(eq)[,1]
   eq@fbar[]=refpts(eq)["msy","harvest"]
-  fm=apply(fbar(eq)%/%m(eq),6,mean)
+  fm=apply(fbar(eq)%/%mval,6,mean)
   fm=FLPar(fm=array(c(fm),c(1,length(c(fm)))))
   rtn=rbind(rtn,fm)
  
   #"m/k",
-  mk=apply(m(eq)%/%par["k"],6,mean)
+  mk=apply(mval%/%par["k"],6,mean)
   mk=FLPar(mk=array(c(mk),c(1,length(c(mk)))))
   rtn=rbind(rtn,mk)
   
