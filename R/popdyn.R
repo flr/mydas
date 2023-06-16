@@ -46,7 +46,7 @@ popdyn<-function(object,eq=lhEql(lhPar(object))){
   
   #lopt
   growth=vonB
-  lop=lopt2(par)
+  lop=FLife:::lopt(par)
   rtn=rbind(rtn,lop)
   
   #lc
