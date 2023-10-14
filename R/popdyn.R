@@ -22,9 +22,9 @@ utils::globalVariables(c("lhEql","lhPar","lopt","maply","lambda"))
 #' popdyn(par)
 #' }
   
-  
+.leslie=leslie   
 popdyn<-function(object,eq=lhEql(lhPar(object))){
-
+  
   par=lhPar(object)
 
   rtn=par[c("linf","k","t0","a50","l50","ato95","a","b","s","v")]
@@ -56,7 +56,7 @@ popdyn<-function(object,eq=lhEql(lhPar(object))){
   rtn=rbind(rtn,lc)
   
   r=maply(seq(dims(eq)$iter), function(x) 
-    log(lambda(leslie(iter(eq,x),fbar=c(refpts(eq)["crash","harvest",x]))[drop=TRUE])))
+    log(lambda(FLife:::leslie(iter(eq,x),fbar=c(refpts(eq)["crash","harvest",x]))[,,1,drop=TRUE])))
   r=FLPar(r=array(c(r),c(1,length(c(r)))))
   rtn=rbind(rtn,r)
   
@@ -120,14 +120,14 @@ popdyn<-function(object,eq=lhEql(lhPar(object))){
   #LF=M
   lfm=FLPar("lfm"=c(0.75*rtn["lc"]+0.25*rtn["linf"]))
   rtn=rbind(rtn,lfm)
-    
+
   r=maply(seq(dims(eq)$iter), function(x) 
-    log(lambda(leslie(iter(eq,x),fbar=c(refpts(eq)["crash","harvest",x]))[drop=TRUE])))
+    log(lambda(FLife:::leslie(iter(eq,x),fbar=c(refpts(eq)["crash","harvest",x]))[,,1,drop=TRUE])))
   r=FLPar(r=array(c(r),c(1,length(c(r)))))
   rtn=rbind(rtn,r)
 
   rc=maply(seq(dims(eq)$iter), function(x) 
-    log(lambda(leslie(iter(eq,x),fbar=c(refpts(eq)["msy","harvest",x]))[drop=TRUE])))
+    log(lambda(FLife:::leslie(iter(eq,x),fbar=c(refpts(eq)["msy","harvest",x]))[,,1,drop=TRUE])))
   rc=FLPar(rc=array(c(rc),c(1,length(c(rc)))))
   rtn=rbind(rtn,rc)
 

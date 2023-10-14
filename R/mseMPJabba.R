@@ -55,7 +55,7 @@ oemFn<-function(om,maxyear=max(dimnames(om)$year),devu=NULL){
   transform(merge(ts,devu,all.x=T),cpue=cpue*exp(residual))[,-6]}
 
 
-jabba2biodyn<-function(object, phase=c("b0"=-1,"r"=4,"k"=3,"p"=-2,"q"=2,"sigma"=1),
+jb2bd<-function(object, phase=c("b0"=-1,"r"=4,"k"=3,"p"=-2,"q"=2,"sigma"=1),
                        min=0.1,max=10){
   
   res=mpb:::biodyn()
@@ -138,7 +138,7 @@ mseMPJabba<-function(om,eq,sa,
                  nt =1,
                  nb =500,
                  nc =2)
-    mp=jabba2biodyn(jb)
+    mp=jb2bd(jb)
     mp=window(mp,end=iYr)
     
     ## Update current year catch
