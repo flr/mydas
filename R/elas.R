@@ -6,8 +6,9 @@ ProdFn<-function(x){
     res=params["m1"]%*%res
     res})
   
-  c(log(lambda(leslie(eql,fbar=c(refpts(eql)["crash","harvest"]))[drop=TRUE])),
-    log(lambda(leslie(eql,fbar=c(refpts(eql)["msy",  "harvest"]))[drop=TRUE])))}
+  c(log(lambda(FLCandy:::leslie(eql,fbar=c(refpts(eql)["crash","harvest"]))[drop=TRUE])),
+    log(lambda(FLCandy:::leslie(eql,fbar=c(refpts(eql)["msy",  "harvest"]))[drop=TRUE]))
+    )}
 
 rFn=function(x){
   eql=lhEql(lhPar(FLPar(x)),m=function(wt,params){
